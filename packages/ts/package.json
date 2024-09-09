@@ -1,0 +1,25 @@
+{
+  "name": "@tsienArron/ts",
+  "version": "0.1.2",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "typescript"
+  ],
+  "description": "Shared typescript config for monorepo (ts) and lib (ts) packages",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/ts"
+  },
+  "main": "tsconfig.json",
+  "peerDependencies": {
+    "@types/node": "^22.5.4",
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "extends": "@tsienArron/ts",
+  "compilerOptions": {
+    "lib": ["esnext", "dom", "dom.iterable"]
+  }
+}

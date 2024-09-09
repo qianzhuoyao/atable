@@ -1,0 +1,27 @@
+{
+  "name": "@tsienArron/syncpack",
+  "version": "0.1.5",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "syncpack"
+  ],
+  "description": "Shared syncpack config",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/syncpack"
+  },
+  "main": "index.js",
+  "devDependencies": {
+    "@types/prettier": "^3.0.0"
+  },
+  "peerDependencies": {
+    "syncpack": "^13.0.0"
+  }
+}

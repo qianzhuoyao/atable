@@ -1,0 +1,27 @@
+{
+  "name": "@tsienArron/commitlint",
+  "version": "0.2.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "commitlint"
+  ],
+  "description": "Shared commitlint config",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/commitlint"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@commitlint/config-conventional": "^19.4.1"
+  },
+  "peerDependencies": {
+    "@commitlint/cli": "^19.4.1"
+  }
+}

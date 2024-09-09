@@ -1,0 +1,41 @@
+{
+  "name": "@tsienArron/remark",
+  "version": "0.1.5",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "md",
+    "remark"
+  ],
+  "description": "Shared remark config",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/remark"
+  },
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "remark-frontmatter": "^5.0.0",
+    "remark-lint-fenced-code-flag": "^4.0.0",
+    "remark-lint-list-item-indent": "^4.0.0",
+    "remark-lint-no-duplicate-headings": "^4.0.0",
+    "remark-lint-no-file-name-irregular-characters": "^3.0.0",
+    "remark-lint-no-undefined-references": "^5.0.0",
+    "remark-preset-lint-consistent": "^6.0.0",
+    "remark-preset-lint-markdown-style-guide": "^6.0.0",
+    "remark-preset-lint-recommended": "^7.0.0",
+    "remark-preset-prettier": "^2.0.1",
+    "remark-toc": "^9.0.0",
+    "remark-validate-links": "^13.0.1"
+  },
+  "peerDependencies": {
+    "remark": "^15.0.1",
+    "remark-cli": "^12.0.1"
+  }
+}

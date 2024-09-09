@@ -1,0 +1,36 @@
+{
+  "name": "@tsienArron/eslint-ts",
+  "version": "0.1.5",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "eslint"
+  ],
+  "description": "Shared eslint config for monorepo (ts) and lib (ts) packages",
+  "license": "MIT",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "repository": {
+
+    "type": "git",
+    "directory": "packages/eslint-ts"
+  },
+
+  "main": "index.js",
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.4.0",
+    "@typescript-eslint/parser": "^8.4.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-log-filenames": "^1.0.6",
+    "eslint-plugin-prettier": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/eslint": "^9.6.1"
+  },
+  "peerDependencies": {
+    "eslint": "^9.9.1 "
+  }
+}

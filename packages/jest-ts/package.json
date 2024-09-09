@@ -1,0 +1,31 @@
+{
+  "name": "@tsienArron/jest-ts",
+  "version": "0.1.8",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "typescript",
+    "jest"
+  ],
+  "description": "Shared jest config",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+
+    "type": "git",
+    "directory": "packages/jest-ts"
+  },
+
+  "main": "index.js",
+  "devDependencies": {
+    "@types/jest": "^29.5.12"
+  },
+  "peerDependencies": {
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
+  }
+}

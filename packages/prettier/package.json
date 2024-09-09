@@ -1,0 +1,27 @@
+{
+  "name": "@tsienArron/prettier",
+  "version": "0.1.4",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "prettier"
+  ],
+  "description": "Shared prettier config",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/prettier"
+  },
+  "main": "index.js",
+  "devDependencies": {
+    "@types/prettier": "^3.0.0"
+  },
+  "peerDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

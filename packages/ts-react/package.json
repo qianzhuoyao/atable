@@ -1,0 +1,33 @@
+{
+  "name": "@tsienArron/ts-react",
+  "version": "0.1.4",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "muravjev",
+    "configs",
+    "pnpm",
+    "typescript",
+    "react"
+  ],
+  "description": "Shared typescript config for lib (ts + react) packages",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "directory": "packages/ts-react"
+  },
+  "main": "tsconfig.json",
+  "dependencies": {
+    "@tsienArron/ts": "workspace:*"
+  },
+  "peerDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.5.4"
+  }
+}

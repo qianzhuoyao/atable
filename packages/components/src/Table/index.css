@@ -1,0 +1,58 @@
+/* 浏览器滚动条整体的宽度 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+/* 滚动条里面的轨道 */
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-left: 1px solid rgba(229, 229, 229, 0.4);
+  border-top: 1px solid rgba(229, 229, 229, 0.4);
+}
+/* 滚动条上的滚动滑块 */
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: #ddd;
+}
+.a-syn-resizer {
+  position: absolute;
+  right: 0px;
+  height: 60%;
+  width: 1px;
+  background: rgba(229, 229, 229, 1);
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+
+.a-syn-resizer.ltr {
+  right: 0;
+}
+
+.a-syn-resizer.rtl {
+  left: 0;
+}
+
+.a-syn-resizer.a-syn-isResizing {
+  background: blue;
+  opacity: 1;
+}
+.a-syn-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.a-syn-row {
+  background: #ffffff;
+  width: fit-content;
+}
+.a-syn-row:hover {
+  background: rgba(54, 122, 228, 0.15) !important;
+}
+.a-syn-cell {
+  /* background: #ffffff; */
+}
+
+.a-syn-cell:hover {
+  /* background: red !important; */
+}

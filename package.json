@@ -1,0 +1,46 @@
+{
+  "name": "@aTable",
+  "private": true,
+  "description": "Shared configs",
+  "author": "tsien arron (arronqzy@outlook.com)",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rimraf \"**/node_modules\"",
+    "fresh": "pnpm clean && pnpm i",
+    "nuke": "rimraf pnpm-lock.yaml && pnpm fresh",
+    "format": "prettier",
+    "format:check": "pnpm format --check --debug-check",
+    "format:fix": "pnpm format --write",
+    "lint": "eslint --ext mjs,js,ts,tsx",
+    "lint:fix": "pnpm lint --fix",
+    "remark": "remark",
+    "remark:fix": "pnpm remark -o --",
+    "commitlint": "commitlint",
+    "syncpack:fix": "syncpack format && syncpack fix-mismatches",
+    "fix": "pnpm lint:fix . && pnpm remark:fix . && pnpm format:fix . && pnpm syncpack:fix",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.25.0",
+    "@commitlint/cli": "^17.1.2",
+    "@tsienArron/commitlint": "workspace: *",
+    "@tsienArron/eslint-ts": "workspace:*",
+    "@tsienArron/prettier": "workspace:*",
+    "@tsienArron/remark": "workspace:*",
+    "@tsienArron/syncpack": "workspace:*",
+    "eslint": "^8.26.0",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "remark": "^14.0.2",
+    "remark-cli": "^11.0.0",
+    "syncpack": "^8.3.9"
+  },
+  "engines": {
+    "node": ">=14.16.0",
+    "pnpm": ">=7.10.0",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm"
+  },
+  "packageManager": "pnpm@7.10.0"
+}

@@ -1,0 +1,145 @@
+import { useCallback, useReducer, useRef } from "react";
+import { IATableConfig, IEffect, ITableParams } from "./type.ts";
+import { initialTableState, TableContext, TableReducer } from "./reducer.ts";
+import { TableSlot } from "./TableSlot.tsx";
+import { UniqueIdentifier } from "@dnd-kit/core";
+
+export const useATable = <T,>(tag?: string) => {
+  const effectRef = useRef<{ m: Partial<IEffect<T>> }>({ m: {} });
+  const [state, dispatch] = useReducer(TableReducer, initialTableState);
+
+  const onRowSelectionChange = useCallback((rows: T[]) => {
+    effectRef.current.m.onSelectChange?.(rows);
+  }, []);
+
+  const onColHeaderResizeStart = useCallback((prop: string) => {
+    effectRef.current.m.onHeaderResizeStart?.(prop);
+  }, []);
+
+  const onTableRefreshCallback = useCallback(() => {
+    effectRef.current.m.onRefreshCallback?.();
+  }, []);
+
+  const onColHeaderResizeEnd = useCallback((prop: string) => {
+    effectRef.current.m.onHeaderResizeEnd?.(prop);
+  }, []);
+  const onTableRowClick = useCallback((row: T) => {
+    effectRef.current.m.onRowClick?.(row);
+  }, []);
+  const onTablePageChange = useCallback(
+    (pageInfo: { pageSize: number; pageIndex: number }) => {
+      effectRef.current.m.onPageChange?.(pageInfo);
+    },
+    []
+  );
+
+  const onColHeaderMoveStart = useCallback((prop: UniqueIdentifier) => {
+    effectRef.current.m.onHeaderMoveStart?.(prop);
+  }, []);
+
+  const onColHeaderMoveEnd = useCallback((prop: UniqueIdentifier) => {
+    effectRef.current.m.onHeaderMoveEnd?.(prop);
+  }, []);
+
+  const TableCreator = useCallback(
+    (tableState: ITableParams<T>, config: IATableConfig) => {
+      return (
+        <TableContext.Provider
+          value={{ state: { ...state, tag, config: config }, dispatch }}
+        >
+          {tableState ? (
+            <TableSlot<T>
+              tableState={tableState}
+              onSelectChange={onRowSelectionChange}
+              onHeaderResizeStart={onColHeaderResizeStart}
+              onHeaderResizeEnd={onColHeaderResizeEnd}
+              onHeaderMoveEnd={onColHeaderMoveEnd}
+              onHeaderMoveStart={onColHeaderMoveStart}
+              onRefreshCallback={onTableRefreshCallback}
+              onRowClick={onTableRowClick}
+              onPageChange={onTablePageChange}
+            />
+          ) : (
+            <></>
+          )}
+        </TableContext.Provider>
+      );
+    },
+    [
+      onColHeaderMoveEnd,
+      onColHeaderMoveStart,
+      onColHeaderResizeEnd,
+      onColHeaderResizeStart,
+      onRowSelectionChange,
+      onTablePageChange,
+      onTableRefreshCallback,
+      onTableRowClick,
+      state,
+      tag,
+    ]
+  );
+
+  const slotBuilder = useCallback(
+    (config: IATableConfig) => {
+      return (tableState: ITableParams<T>) => TableCreator(tableState, config);
+    },
+    [TableCreator]
+  );
+
+  const onRefreshCallback = useCallback(
+    (cb: IEffect<T>["onRefreshCallback"]) => {
+      effectRef.current.m.onRefreshCallback = cb;
+    },
+    []
+  );
+
+  const onHeaderResizeStart = useCallback(
+    (cb: IEffect<T>["onHeaderResizeStart"]) => {
+      effectRef.current.m.onHeaderResizeStart = cb;
+    },
+    []
+  );
+
+  const onHeaderResizeEnd = useCallback(
+    (cb: IEffect<T>["onHeaderResizeEnd"]) => {
+      effectRef.current.m.onHeaderResizeEnd = cb;
+    },
+    []
+  );
+
+  const onHeaderMoveStart = useCallback(
+    (cb: IEffect<T>["onHeaderMoveStart"]) => {
+      effectRef.current.m.onHeaderMoveStart = cb;
+    },
+    []
+  );
+
+  const onHeaderMoveEnd = useCallback((cb: IEffect<T>["onHeaderMoveEnd"]) => {
+    effectRef.current.m.onHeaderMoveEnd = cb;
+  }, []);
+
+  const onSelectChange = useCallback((cb: IEffect<T>["onSelectChange"]) => {
+    effectRef.current.m.onSelectChange = cb;
+  }, []);
+  const onRowClick = useCallback((cb: IEffect<T>["onRowClick"]) => {
+    effectRef.current.m.onRowClick = cb;
+  }, []);
+  const setUpdate = useCallback((cb: IEffect<T>["setUpdate"]) => {
+    effectRef.current.m.setUpdate = cb;
+  }, []);
+  const onPageChange = useCallback((cb: IEffect<T>["onPageChange"]) => {
+    effectRef.current.m.onPageChange = cb;
+  }, []);
+  return {
+    slotBuilder,
+    setUpdate,
+    onHeaderResizeStart,
+    onRefreshCallback,
+    onHeaderMoveStart,
+    onRowClick,
+    onHeaderResizeEnd,
+    onHeaderMoveEnd,
+    onSelectChange,
+    onPageChange,
+  };
+};
