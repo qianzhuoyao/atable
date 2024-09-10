@@ -51,6 +51,9 @@
 }
 .a-syn-cell {
   /* background: #ffffff; */
+  display: flex;
+  align-items: center;
+
 }
 
 .a-syn-cell:hover {

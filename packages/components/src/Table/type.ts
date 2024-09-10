@@ -31,6 +31,7 @@ export interface IATableConfig {
   selectModel?: boolean;
   expand?: boolean;
   rowKey?: string;
+  subRowsKey?: string;
   showTools?: boolean;
   tools?: (typeof TOOLS)[number][];
   showSelectedInfo?: boolean;

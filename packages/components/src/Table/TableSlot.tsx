@@ -47,7 +47,6 @@ import {
   useReactTable,
   flexRender,
   Header,
-  ColumnDef,
   Table,
   ColumnResizeMode,
   ColumnResizeDirection,
@@ -55,10 +54,11 @@ import {
   RowSelectionState,
   ExpandedState,
   getExpandedRowModel,
-  getPaginationRowModel,
   getFilteredRowModel,
 } from "@tanstack/react-table";
 import { Loading } from "./loading.tsx";
+
+const DEFAULT_SELECT_WIDTH = 40;
 
 const IndeterminateCheckbox = memo(
   ({
@@ -94,7 +94,8 @@ const HeaderCheckBox = <T,>({
   table: Table<T>;
   expand?: boolean;
 }) => {
-  console.log(table.getIsSomeRowsSelected(), "table.getIsAllRowsSelected()");
+  console.log("table.getIsAllRowsSelected()");
+
   return (
     <>
       <IndeterminateCheckbox
@@ -103,7 +104,7 @@ const HeaderCheckBox = <T,>({
           indeterminate: table.getIsSomeRowsSelected(),
           onChange: table.getToggleAllRowsSelectedHandler(),
         }}
-      />{" "}
+      />
       {expand ? (
         <div
           {...{
@@ -176,10 +177,12 @@ const DraggableTableHeader = <T,>({
   headerStyle,
   columnResizeMode,
   onHeaderResizeStart,
+  expand,
   onHeaderResizeEnd,
 }: {
   header: Header<T, unknown>;
   table: Table<T>;
+  expand?: boolean;
   headerStyle?: (prop: string) => CSSProperties;
   columnResizeMode: ColumnResizeMode;
 } & Pick<IEffect<T>, "onHeaderResizeStart" | "onHeaderResizeEnd">) => {
@@ -224,7 +227,7 @@ const DraggableTableHeader = <T,>({
     },
     [header, onHeaderResizeStart]
   );
-
+  console.log(table.getExpandedDepth(), "getExpandedDepth");
   return (
     <div
       {...attributes}
@@ -245,10 +248,14 @@ const DraggableTableHeader = <T,>({
         className="a-syn-truncate"
         style={{
           height: "100%",
-          minWidth: header.getSize(),
+          minWidth:
+            header.column.id !== SELECT_KEY
+              ? header.getSize()
+              : table.getExpandedDepth() * 15 + DEFAULT_SELECT_WIDTH,
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent:
+            header.column.id === SELECT_KEY && !expand ? "center" : "",
           position: "relative",
           ...headerStyle?.(header.column.id),
         }}
@@ -299,13 +306,13 @@ export const TableSlot = <T,>({
   tableState: ITableParams<T>;
 } & Omit<IEffect<T>, "setUpdate">) => {
   const selectedRef = useRef<{
-    list: Map<string, T>;
-    pre: T[];
-    preRowSelection: RowSelectionState;
+    //跨业选中
+    pageCache: RowSelectionState;
+    //跨业所有数据
+    pageList: Record<string, T[]>;
   }>({
-    list: new Map(),
-    pre: [],
-    preRowSelection: {},
+    pageCache: {},
+    pageList: {},
   });
   const { state: ctxState } = useTableContext();
   const [columnSizing, setColumnSizing] = useState({});
@@ -314,14 +321,13 @@ export const TableSlot = <T,>({
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
-
   const {
     col,
     data,
     pageIndex,
     pageSize,
-    setData,
     total,
+    setData,
     selectedRowKeyList,
     clickedRowKeyList,
     cellStyle,
@@ -339,7 +345,7 @@ export const TableSlot = <T,>({
         col.unshift({
           id: SELECT_KEY,
           accessorKey: SELECT_KEY,
-          size: 40,
+          size: DEFAULT_SELECT_WIDTH,
           header: ({ table }) => (
             <HeaderCheckBox<T>
               table={table}
@@ -349,19 +355,26 @@ export const TableSlot = <T,>({
           cell: ({ row }) => (
             <div
               style={{
-                paddingLeft: `${row.depth * 2}rem`,
+                paddingLeft: `${row.depth * 15}px`,
               }}
             >
-              <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <IndeterminateCheckbox
                   {...{
-                    checked: row.getIsSelected(),
+                    checked:
+                      row.getIsSelected() || row.getIsAllSubRowsSelected(),
                     indeterminate: row.getIsSomeSelected(),
                     onChange: row.getToggleSelectedHandler(),
                   }}
                 />
 
-                {row.getCanExpand() ? (
+                {ctxState.config.expand && row.getCanExpand() ? (
                   <div
                     {...{
                       onClick: row.getToggleExpandedHandler(),
@@ -386,6 +399,7 @@ export const TableSlot = <T,>({
     }
     return col;
   }, [col, ctxState.config.expand, ctxState.config.selectModel]);
+
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [columnResizeMode] = useState<ColumnResizeMode>("onChange");
   const [columnResizeDirection] = useState<ColumnResizeDirection>("ltr");
@@ -394,11 +408,44 @@ export const TableSlot = <T,>({
   );
 
   useEffect(() => {
+    //数据数量不对则放弃
+    if (data?.length === pageSize) {
+      selectedRef.current.pageList[String(pageIndex)] = data;
+    }
+  }, [data, pageIndex, pageSize]);
+
+  useEffect(() => {
+    setData(() => {
+      console.log(
+        filterModel,
+        pageIndex,
+        selectedRef.current.pageList,
+        selectedRef.current.pageList[String(pageIndex)],
+        "pageListpageIndexss"
+      );
+      if (filterModel === "selected") {
+        return Object.values(selectedRef.current.pageList).reduce(
+          (a, b) => a.concat(b),
+          []
+        );
+      } else {
+        return selectedRef.current.pageList[String(pageIndex)];
+      }
+    });
+  }, [filterModel, pageIndex, setData]);
+
+  useEffect(() => {
     console.log(columns, "columnssss");
     setColumnOrder(() => columns.map((c) => c.id || ""));
   }, [columns]);
 
-  const DragAlongCell = <T,>({ cell }: { cell: Cell<T, unknown> }) => {
+  const DragAlongCell = <T,>({
+    cell,
+    expand,
+  }: {
+    cell: Cell<T, unknown>;
+    expand?: boolean;
+  }) => {
     const { isDragging, setNodeRef, transform } = useSortable({
       id: cell.column.id,
     });
@@ -410,7 +457,7 @@ export const TableSlot = <T,>({
       width: cell.column.getSize(),
       zIndex: isDragging ? 4 : 0,
     };
-    console.log(cell, "cellcell");
+    console.log(cell, table.getExpandedDepth(), "cellcell");
     return (
       <div
         key={cell.id}
@@ -418,9 +465,16 @@ export const TableSlot = <T,>({
         className="a-syn-cell"
         style={{
           ...(cell.column.id !== SELECT_KEY ? style : { zIndex: 90 }),
+          display: "flex",
+          justifyContent:
+            cell.column.id === SELECT_KEY && !expand ? "center" : "",
           position: cell.column.id === SELECT_KEY ? "sticky" : "static",
           left: cell.column.id === SELECT_KEY ? "0px" : "0px",
-          minWidth: cell.column.getSize(),
+          // minWidth: cell.column.getSize(),
+          minWidth:
+            cell.column.id !== SELECT_KEY
+              ? cell.column.getSize()
+              : table.getExpandedDepth() * 15 + DEFAULT_SELECT_WIDTH,
           borderBottom: "1px solid rgba(229, 229, 229, 1)",
           minHeight: "36px",
           lineHeight: "36px",
@@ -446,37 +500,65 @@ export const TableSlot = <T,>({
     },
     columnResizeMode,
     columnResizeDirection,
+    getRowId: (row) => {
+      try {
+        return (row as Record<string, string>)[
+          ctxState.config.rowKey as string
+        ];
+      } catch (e) {
+        //ignore
+        console.error(e);
+        throw new Error(e as string);
+      }
+    },
     onExpandedChange: setExpanded,
+    getSubRows: (row) => {
+      try {
+        return (row as Record<string, T[]>)[
+          (ctxState.config.subRowsKey || "subRows") as string
+        ];
+      } catch (e) {
+        //ignore
+        console.error(e);
+      }
+    },
     onColumnSizingChange: setColumnSizing,
     onColumnOrderChange: setColumnOrder,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
     getExpandedRowModel: getExpandedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     debugTable: false,
     debugHeaders: false,
     debugColumns: false,
   });
-  console.log(table.getAllColumns(), rowSelection, "table.getRowModel().rows");
+  console.log(
+    table.getSelectedRowModel().rows,
+    rowSelection,
+    "table.getRowModel().rows"
+  );
 
-  useEffect(() => {
-    Object.keys(rowSelection).map((id) => {
-      const row = table.getRowModel().rowsById[id];
-
-      if (!ctxState.config.rowKey) {
-        throw new Error("选取的rowKey值必须存在");
-      }
-
-      selectedRef.current.list.set(
-        String(
-          (row.original as Record<string, string>)[ctxState.config.rowKey || ""]
-        ),
-        row.original
-      );
-    });
-  }, [ctxState.config.rowKey, rowSelection, table]);
+  // useEffect(() => {
+  //   // console.log(rowSelection, "rowSelectionsss");
+  //   Object.keys(rowSelection).map((id) => {
+  //     const row = table.getRowModel().rowsById[id];
+  //     console.log(rowSelection, row, expanded, "rowSelectionsss");
+  //     if (!ctxState.config.rowKey) {
+  //       throw new Error("选取的rowKey值必须存在");
+  //     }
+  //     if (row) {
+  //       selectedRef.current.list.set(
+  //         String(
+  //           (row.original as Record<string, string>)[
+  //             ctxState.config.rowKey || ""
+  //           ]
+  //         ),
+  //         row.original
+  //       );
+  //     }
+  //   });
+  // }, [ctxState.config.rowKey, expanded, rowSelection, table]);
 
   useEffect(() => {
     const tableClickedRowKeyList: unknown[] | undefined =
@@ -490,14 +572,22 @@ export const TableSlot = <T,>({
   }, [clickedRowKeyList, table]);
 
   useEffect(() => {
+    selectedRef.current.pageCache = {
+      ...selectedRef.current.pageCache,
+      ...rowSelection,
+    };
+  }, [rowSelection]);
+
+  useEffect(() => {
     onSelectChange?.(
-      Object.keys(rowSelection).map((key) => {
+      Object.keys(selectedRef.current.pageCache).map((key) => {
         return table.getRow(key).original;
       })
     );
-  }, [onSelectChange, rowSelection, table]);
+  }, [onSelectChange, table]);
 
   useEffect(() => {
+    console.log("d3wdfff");
     const selectRowKeyList: unknown[] | undefined =
       typeof selectedRowKeyList === "function"
         ? selectedRowKeyList(
@@ -513,11 +603,15 @@ export const TableSlot = <T,>({
       const selection: RowSelectionState = {};
       table.getRowModel().rows?.map((row) => {
         if (
+          ctxState.config.rowKey &&
+          row.original &&
           selectRowKeyList?.includes(
             (row.original as Record<string, unknown>)[key]
           )
         ) {
-          selection[row.index] = true;
+          selection[
+            (row.original as Record<string, string>)[ctxState.config.rowKey]
+          ] = true;
         }
       });
 
@@ -568,9 +662,10 @@ export const TableSlot = <T,>({
   );
   const onHandleQuitFilter = useCallback(() => {
     setFilterModel("none");
-    setData(() => selectedRef.current.pre);
-    setRowSelection(() => selectedRef.current.preRowSelection);
-  }, [setData]);
+    // setData(() => selectedRef.current.pre);
+    // setExpanded(() => selectedRef.current.preExpanded);
+    // setRowSelection(() => selectedRef.current.preRowSelection);
+  }, []);
   const onHandleClearSelection = useCallback(() => {
     setRowSelection({});
   }, []);
@@ -596,31 +691,10 @@ export const TableSlot = <T,>({
     [ctxState.config.rowKey, onRowClick]
   );
   const onFilterSelectionRows = useCallback(() => {
-    console.log(
-      selectedRef.current.list,
-      selectedRef.current.list.values(),
-      "selectedRef.current.list"
-    );
-
     if (filterModel === "none") {
       setFilterModel("selected");
-      //先备份
-      selectedRef.current.pre = table
-        .getRowModel()
-        .rows.map((row) => row.original);
-      selectedRef.current.preRowSelection = rowSelection;
-      setRowSelection((selectionRows) => {
-        const selectionObj: RowSelectionState = {};
-        Object.keys(selectionRows).map((_, index) => {
-          selectionObj[index] = true;
-        });
-        return selectionObj;
-      });
-      setData(() => {
-        return [...selectedRef.current.list.values()];
-      });
     }
-  }, [filterModel, rowSelection, setData, table]);
+  }, [filterModel]);
 
   if (loading) {
     return (
@@ -641,25 +715,7 @@ export const TableSlot = <T,>({
       </div>
     );
   }
-  if (data.length === 0) {
-    return (
-      <div
-        style={{
-          overflow: "hidden",
-          padding: "5px",
-          fontSize: "50px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          border: "1px solid rgba(54, 122, 228, 0.3)",
-          borderRadius: "2px",
-          ...style,
-        }}
-      >
-        <Empty></Empty>
-      </div>
-    );
-  }
+
   console.log(table.getRowModel(), data, "csew3fggf");
   return (
     <DndContext
@@ -837,92 +893,126 @@ export const TableSlot = <T,>({
             <></>
           )}
         </>
-        <div
-          style={{
-            overflow: "auto",
-            border: "1px solid rgba(229, 229, 229, 1)",
-            borderRadius: "2px",
-          }}
-        >
+        {data?.length ? (
           <div
             style={{
-              position: "sticky",
-              top: 0,
-              zIndex: 99,
-              color: "rgba(0, 0, 0, 0.85)",
-              background: "#fff",
-              fontSize: "14px",
-              borderBottom: "1px solid rgba(229, 229, 229, 1)",
+              overflow: "auto",
+              border: "1px solid rgba(229, 229, 229, 1)",
+              borderRadius: "2px",
             }}
           >
-            {table.getHeaderGroups().map((headerGroup) => (
-              <div
-                key={headerGroup.id}
-                style={{
-                  display: "flex",
-                  height: "36px",
-                  alignItems: "center",
-                }}
-              >
-                <SortableContext
-                  items={columnOrder}
-                  strategy={horizontalListSortingStrategy}
-                >
-                  {headerGroup.headers.map((header) => (
-                    <DraggableTableHeader
-                      key={header.id}
-                      table={table}
-                      headerStyle={headerStyle}
-                      onHeaderResizeStart={onHeaderResizeStart}
-                      onHeaderResizeEnd={onHeaderResizeEnd}
-                      columnResizeMode={columnResizeMode}
-                      header={header}
-                    ></DraggableTableHeader>
-                  ))}
-                </SortableContext>
-              </div>
-            ))}
-          </div>
-          <div
-            style={{
-              height: `calc(${style?.height} - 130px)`,
-              // overflowY: "auto",
-              width: "100%",
-            }}
-          >
-            {table.getRowModel().rows.map((row) => {
-              return (
+            <div
+              style={{
+                position: "sticky",
+                top: 0,
+                zIndex: 99,
+                color: "rgba(0, 0, 0, 0.85)",
+                background: "#fff",
+                fontSize: "14px",
+                borderBottom: "1px solid rgba(229, 229, 229, 1)",
+              }}
+            >
+              {table.getHeaderGroups().map((headerGroup) => (
                 <div
-                  key={row.id}
-                  className="a-syn-row"
+                  key={headerGroup.id}
                   style={{
-                    background: clickedRows.includes(
-                      (row.original as Record<string, unknown>)[
-                        ctxState.config.rowKey || ""
-                      ]
-                    )
-                      ? "rgba(54, 122, 228, 0.35)"
-                      : row.getIsSelected()
-                      ? "rgba(54, 122, 228, 0.15)"
-                      : "",
                     display: "flex",
+                    height: "36px",
+                    alignItems: "center",
                   }}
-                  onClick={() => onHandleClickRow(row.original)}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <SortableContext
-                      key={cell.id}
-                      items={columnOrder}
-                      strategy={horizontalListSortingStrategy}
-                    >
-                      <DragAlongCell<T> key={cell.id} cell={cell} />
-                    </SortableContext>
-                  ))}
+                  <SortableContext
+                    items={columnOrder}
+                    strategy={horizontalListSortingStrategy}
+                  >
+                    {headerGroup.headers.map((header) => (
+                      <DraggableTableHeader
+                        key={header.id}
+                        table={table}
+                        expand={ctxState.config.expand}
+                        headerStyle={headerStyle}
+                        onHeaderResizeStart={onHeaderResizeStart}
+                        onHeaderResizeEnd={onHeaderResizeEnd}
+                        columnResizeMode={columnResizeMode}
+                        header={header}
+                      ></DraggableTableHeader>
+                    ))}
+                  </SortableContext>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            <div
+              style={{
+                height: `calc(${style?.height} - 130px)`,
+                // overflowY: "auto",
+                width: "100%",
+              }}
+            >
+              {table.getRowModel().rows.map((row) => {
+                return (
+                  <div
+                    key={row.id}
+                    className="a-syn-row"
+                    style={{
+                      display:
+                        filterModel === "selected" &&
+                        !(
+                          row.getIsAllSubRowsSelected() ||
+                          row.getIsSomeSelected() ||
+                          row.getIsSelected()
+                        )
+                          ? "none"
+                          : "flex",
+                      background: clickedRows.includes(
+                        (row.original as Record<string, unknown>)[
+                          ctxState.config.rowKey || ""
+                        ]
+                      )
+                        ? "rgba(54, 122, 228, 0.35)"
+                        : row.getIsSelected()
+                        ? "rgba(54, 122, 228, 0.15)"
+                        : "",
+                    }}
+                    onClick={() => onHandleClickRow(row.original)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <SortableContext
+                        key={cell.id}
+                        items={columnOrder}
+                        strategy={horizontalListSortingStrategy}
+                      >
+                        <DragAlongCell<T>
+                          key={cell.id}
+                          cell={cell}
+                          expand={ctxState.config.expand}
+                        />
+                      </SortableContext>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div
+            style={{
+              overflow: "hidden",
+              padding: "5px",
+              fontSize: "50px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+
+              border: "1px solid rgba(54, 122, 228, 0.3)",
+              borderRadius: "2px",
+              ...style,
+              width: `calc(100% - 10px)`,
+              height: `calc(${style?.height} - 100px)`,
+            }}
+          >
+            <Empty></Empty>
+          </div>
+        )}
 
         {ctxState.config.hideFooter ? (
           <></>
@@ -940,7 +1030,11 @@ export const TableSlot = <T,>({
               }}
             >
               <span>总计</span>
-              <span>{total}</span>
+              <span>
+                {filterModel === "none"
+                  ? total
+                  : Object.keys(rowSelection).length}
+              </span>
             </div>
             <Pagination
               size="small"

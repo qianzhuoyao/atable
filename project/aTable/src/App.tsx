@@ -2,6 +2,7 @@ import { useATable } from "@ATable/components";
 import "./App.css";
 import { makeData, Person } from "./makeData";
 import { HTMLProps, useEffect, useMemo, useRef, useState } from "react";
+const dataList = [makeData(20, 5, 3), makeData(20, 5, 3)];
 function App() {
   const columns = useMemo<any[]>(
     () => [
@@ -41,20 +42,26 @@ function App() {
     []
   );
 
-  const [data, setData] = useState(() => makeData(100, 5, 3));
-  const { slotBuilder, onSelectChange, onRefreshCallback } =
+  const [data, setData] = useState(() => dataList[0]);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const { slotBuilder, onSelectChange, onRefreshCallback, onPageChange } =
     useATable<Person>("tag");
-
+  console.log(data, "sfdata");
   onRefreshCallback(() => {
     console.log("reweeeeee");
   });
-
+  onPageChange(({ pageIndex, pageSize }) => {
+    setPageIndex(pageIndex);
+    setPageSize(pageSize);
+    setData(dataList[pageIndex - 1]);
+  });
   const table = slotBuilder({
     showTools: true,
     selectModel: true,
     expand: true,
     showSelectedInfo: true,
-    rowKey: "visits",
+    rowKey: "id",
   });
   onSelectChange((e) => {
     console.log(e, "defgggggg");
@@ -67,13 +74,12 @@ function App() {
           width: "1000px",
         },
 
-        setData,
         data,
-
+        setData,
         col: columns,
-        pageSize: 20,
-        pageIndex: 1,
-        total: 20,
+        pageSize,
+        pageIndex,
+        total: 50,
       })}
     </>
   );
