@@ -72,6 +72,13 @@ function App() {
 
         data,
         setData,
+        selectedRowKeyList:(rows)=>{
+          return rows.map(i=>{
+            if(i.age>10){
+              return i.id
+            }
+          })
+        },
         colSortable: () => true,
         headerStyle: () => ({
           paddingLeft: "20px",

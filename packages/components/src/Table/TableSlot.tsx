@@ -478,7 +478,7 @@ export const TableSlot = <T,>({
 
   useEffect(() => {
     //数据数量不对则放弃
-    if (checkData?.length === pageSize) {
+    if (checkData?.length <= pageSize) {
       selectedRef.current.pageList[String(pageIndex)] = checkData;
     }
   }, [checkData, pageIndex, pageSize]);
