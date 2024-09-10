@@ -16,6 +16,8 @@ import {
   AppstoreOutlined,
   ArrowDownOutlined,
   ArrowRightOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined,
   InfoCircleOutlined,
   RedoOutlined,
   SettingOutlined,
@@ -55,6 +57,7 @@ import {
   ExpandedState,
   getExpandedRowModel,
   getFilteredRowModel,
+  HeaderContext,
 } from "@tanstack/react-table";
 import { Loading } from "./loading.tsx";
 
@@ -161,7 +164,7 @@ const ColVisibleContent = <T,>({ table }: { table: Table<T> }) => {
                     column,
                     header: {},
                     table,
-                  } as any)
+                  } as HeaderContext<T, unknown>)
                 : column.columnDef.header}
             </label>
           </div>
@@ -174,18 +177,33 @@ const ColVisibleContent = <T,>({ table }: { table: Table<T> }) => {
 const DraggableTableHeader = <T,>({
   header,
   table,
+  hasSyncPermission,
   headerStyle,
   columnResizeMode,
   onHeaderResizeStart,
+  onTableSync,
+  colSortable,
+  onAscSort,
+  onDescSort,
   expand,
   onHeaderResizeEnd,
 }: {
+  colSortable?: (prop: string) => boolean;
+  hasSyncPermission: number;
   header: Header<T, unknown>;
   table: Table<T>;
   expand?: boolean;
   headerStyle?: (prop: string) => CSSProperties;
   columnResizeMode: ColumnResizeMode;
-} & Pick<IEffect<T>, "onHeaderResizeStart" | "onHeaderResizeEnd">) => {
+} & Pick<
+  IEffect<T>,
+  | "onHeaderResizeStart"
+  | "onHeaderResizeEnd"
+  | "onTableSync"
+  | "onAscSort"
+  | "onDescSort"
+>) => {
+  const { state } = useTableContext();
   const { attributes, isDragging, listeners, setNodeRef, transform } =
     useSortable({
       id: header.column.id,
@@ -202,7 +220,27 @@ const DraggableTableHeader = <T,>({
 
   const onHandleResizeOver = useCallback(() => {
     onHeaderResizeEnd?.(header.id);
-  }, [header.id, onHeaderResizeEnd]);
+    console.log(table.getAllColumns(), "table.getAllColumns()");
+    if (hasSyncPermission) {
+      onTableSync?.(
+        table.getAllColumns().map((col) => {
+          return {
+            field: col.id,
+            moduleKey: state.tag,
+            visible: col.getIsVisible(),
+            flex: col.getSize(),
+          };
+        })
+      );
+    }
+  }, [
+    hasSyncPermission,
+    header.id,
+    onHeaderResizeEnd,
+    onTableSync,
+    state.tag,
+    table,
+  ]);
 
   const onHandleResizeTouchHandler = useCallback<
     React.TouchEventHandler<HTMLDivElement>
@@ -242,6 +280,7 @@ const DraggableTableHeader = <T,>({
         background: "rgba(245, 248, 253, 1)",
         display: "flex",
         alignItems: "center",
+        ...(header.column.id !== SELECT_KEY && headerStyle?.(header.column.id)),
       }}
     >
       <div
@@ -257,12 +296,36 @@ const DraggableTableHeader = <T,>({
           justifyContent:
             header.column.id === SELECT_KEY && !expand ? "center" : "",
           position: "relative",
-          ...headerStyle?.(header.column.id),
         }}
       >
         {header.isPlaceholder
           ? null
           : flexRender(header.column.columnDef.header, header.getContext())}
+        {colSortable?.(header.column.id) && header.column.id !== SELECT_KEY ? (
+          <div
+            style={{
+              fontSize: "10px",
+              zoom: 0.8,
+              paddingLeft: "5px",
+            }}
+          >
+            <CaretUpOutlined
+              style={{
+                cursor: "pointer",
+              }}
+              onClick={() => onAscSort?.(header.column.id)}
+            />
+            <CaretDownOutlined
+              style={{
+                display: "block",
+                cursor: "pointer",
+              }}
+              onClick={() => onDescSort?.(header.column.id)}
+            />
+          </div>
+        ) : (
+          <></>
+        )}
         <div
           {...{
             // onDoubleClick: () => header.column.resetSize(),
@@ -299,6 +362,9 @@ export const TableSlot = <T,>({
   onHeaderMoveStart,
   onHeaderResizeEnd,
   onHeaderResizeStart,
+  onAscSort,
+  onDescSort,
+  onTableSync,
   onRefreshCallback,
   onPageChange,
   onRowClick,
@@ -331,10 +397,13 @@ export const TableSlot = <T,>({
     selectedRowKeyList,
     clickedRowKeyList,
     cellStyle,
+    colSortable,
     headerStyle,
     loading,
     style,
   } = tableState;
+
+  const checkData = useMemo(() => data || [], [data]);
 
   const columns = useMemo(() => {
     if (ctxState.config.selectModel) {
@@ -409,10 +478,10 @@ export const TableSlot = <T,>({
 
   useEffect(() => {
     //数据数量不对则放弃
-    if (data?.length === pageSize) {
-      selectedRef.current.pageList[String(pageIndex)] = data;
+    if (checkData?.length === pageSize) {
+      selectedRef.current.pageList[String(pageIndex)] = checkData;
     }
-  }, [data, pageIndex, pageSize]);
+  }, [checkData, pageIndex, pageSize]);
 
   useEffect(() => {
     setData(() => {
@@ -480,7 +549,8 @@ export const TableSlot = <T,>({
           lineHeight: "36px",
           color: "rgba(0, 0, 0, 0.85)",
           fontSize: "14px",
-          ...cellStyle?.(cell.column.id, cell.row.original),
+          ...(cell.column.id !== SELECT_KEY &&
+            cellStyle?.(cell.column.id, cell.row.original)),
         }}
       >
         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -489,7 +559,7 @@ export const TableSlot = <T,>({
   };
 
   const table = useReactTable({
-    data,
+    data: checkData,
     columns,
     state: {
       columnVisibility,
@@ -533,32 +603,7 @@ export const TableSlot = <T,>({
     debugHeaders: false,
     debugColumns: false,
   });
-  console.log(
-    table.getSelectedRowModel().rows,
-    rowSelection,
-    "table.getRowModel().rows"
-  );
-
-  // useEffect(() => {
-  //   // console.log(rowSelection, "rowSelectionsss");
-  //   Object.keys(rowSelection).map((id) => {
-  //     const row = table.getRowModel().rowsById[id];
-  //     console.log(rowSelection, row, expanded, "rowSelectionsss");
-  //     if (!ctxState.config.rowKey) {
-  //       throw new Error("选取的rowKey值必须存在");
-  //     }
-  //     if (row) {
-  //       selectedRef.current.list.set(
-  //         String(
-  //           (row.original as Record<string, string>)[
-  //             ctxState.config.rowKey || ""
-  //           ]
-  //         ),
-  //         row.original
-  //       );
-  //     }
-  //   });
-  // }, [ctxState.config.rowKey, expanded, rowSelection, table]);
+  console.log(rowSelection, "table.getRowModel().rows");
 
   useEffect(() => {
     const tableClickedRowKeyList: unknown[] | undefined =
@@ -620,12 +665,16 @@ export const TableSlot = <T,>({
   }, [ctxState.config.rowKey, selectedRowKeyList, table]);
 
   console.log(
-    data,
+    checkData,
     rowSelection,
     ctxState.config.showTools,
     columnOrder,
     "ctxState.config.showTools"
   );
+
+  const hasSyncPermission = useMemo(() => {
+    return permissions & SYNC;
+  }, [permissions]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -638,11 +687,24 @@ export const TableSlot = <T,>({
           return arrayMove(columnOrder, oldIndex, newIndex); //this is just a splice util
         });
         onHeaderMoveEnd?.(active.id);
+        if (hasSyncPermission) {
+          onTableSync?.(
+            table.getAllColumns().map((col) => {
+              return {
+                field: col.id,
+                moduleKey: ctxState.tag,
+                visible: col.getIsVisible(),
+                flex: col.getSize(),
+              };
+            })
+          );
+        }
       }
     },
-    [onHeaderMoveEnd]
+    [ctxState.tag, hasSyncPermission, onHeaderMoveEnd, onTableSync, table]
   );
 
+  const onHandleAutoComputedWidth = useCallback(() => {}, []);
   const onHandleRefresh = useCallback(() => {
     onRefreshCallback?.();
   }, [onRefreshCallback]);
@@ -716,7 +778,7 @@ export const TableSlot = <T,>({
     );
   }
 
-  console.log(table.getRowModel(), data, "csew3fggf");
+  console.log(table.getRowModel(), checkData, "csew3fggf");
   return (
     <DndContext
       collisionDetection={closestCenter}
@@ -860,7 +922,7 @@ export const TableSlot = <T,>({
                           paddingLeft: "5px",
                           color: "rgb(54, 122, 228)",
                         }}
-                        onClick={() => {}}
+                        onClick={onHandleAutoComputedWidth}
                       />
                     ) : (
                       <></>
@@ -893,7 +955,7 @@ export const TableSlot = <T,>({
             <></>
           )}
         </>
-        {data?.length ? (
+        {checkData?.length ? (
           <div
             style={{
               overflow: "auto",
@@ -929,8 +991,13 @@ export const TableSlot = <T,>({
                       <DraggableTableHeader
                         key={header.id}
                         table={table}
+                        onAscSort={onAscSort}
+                        onDescSort={onDescSort}
                         expand={ctxState.config.expand}
                         headerStyle={headerStyle}
+                        hasSyncPermission={hasSyncPermission}
+                        onTableSync={onTableSync}
+                        colSortable={colSortable}
                         onHeaderResizeStart={onHeaderResizeStart}
                         onHeaderResizeEnd={onHeaderResizeEnd}
                         columnResizeMode={columnResizeMode}

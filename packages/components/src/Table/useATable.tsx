@@ -1,5 +1,5 @@
 import { useCallback, useReducer, useRef } from "react";
-import { IATableConfig, IEffect, ITableParams } from "./type.ts";
+import { IATableConfig, IColInfo, IEffect, ITableParams } from "./type.ts";
 import { initialTableState, TableContext, TableReducer } from "./reducer.ts";
 import { TableSlot } from "./TableSlot.tsx";
 import { UniqueIdentifier } from "@dnd-kit/core";
@@ -25,6 +25,15 @@ export const useATable = <T,>(tag?: string) => {
   }, []);
   const onTableRowClick = useCallback((row: T) => {
     effectRef.current.m.onRowClick?.(row);
+  }, []);
+  const onTableColInfoChange = useCallback((info: IColInfo[]) => {
+    effectRef.current.m.onTableSync?.(info);
+  }, []);
+  const onTableAscSort = useCallback((prop: string) => {
+    effectRef.current.m.onAscSort?.(prop);
+  }, []);
+  const onTableDescSort = useCallback((prop: string) => {
+    effectRef.current.m.onDescSort?.(prop);
   }, []);
   const onTablePageChange = useCallback(
     (pageInfo: { pageSize: number; pageIndex: number }) => {
@@ -58,6 +67,9 @@ export const useATable = <T,>(tag?: string) => {
               onRefreshCallback={onTableRefreshCallback}
               onRowClick={onTableRowClick}
               onPageChange={onTablePageChange}
+              onTableSync={onTableColInfoChange}
+              onAscSort={onTableAscSort}
+              onDescSort={onTableDescSort}
             />
           ) : (
             <></>
@@ -71,6 +83,9 @@ export const useATable = <T,>(tag?: string) => {
       onColHeaderResizeEnd,
       onColHeaderResizeStart,
       onRowSelectionChange,
+      onTableAscSort,
+      onTableColInfoChange,
+      onTableDescSort,
       onTablePageChange,
       onTableRefreshCallback,
       onTableRowClick,
@@ -130,6 +145,15 @@ export const useATable = <T,>(tag?: string) => {
   const onPageChange = useCallback((cb: IEffect<T>["onPageChange"]) => {
     effectRef.current.m.onPageChange = cb;
   }, []);
+  const onTableSync = useCallback((cb: IEffect<T>["onTableSync"]) => {
+    effectRef.current.m.onTableSync = cb;
+  }, []);
+  const onDescSort = useCallback((cb: IEffect<T>["onDescSort"]) => {
+    effectRef.current.m.onDescSort = cb;
+  }, []);
+  const onAscSort = useCallback((cb: IEffect<T>["onAscSort"]) => {
+    effectRef.current.m.onAscSort = cb;
+  }, []);
   return {
     slotBuilder,
     setUpdate,
@@ -137,9 +161,12 @@ export const useATable = <T,>(tag?: string) => {
     onRefreshCallback,
     onHeaderMoveStart,
     onRowClick,
+    onDescSort,
+    onAscSort,
     onHeaderResizeEnd,
     onHeaderMoveEnd,
     onSelectChange,
     onPageChange,
+    onTableSync,
   };
 };

@@ -14,6 +14,13 @@ interface IUpdateParams {
   pageSize: number;
 }
 
+export interface IColInfo {
+  field?: string;
+  flex: number;
+  moduleKey?: string;
+  visible: boolean;
+}
+
 export interface IEffect<T> {
   onRefreshCallback: () => void;
   onSelectChange: (targetRows: T[]) => void;
@@ -22,7 +29,10 @@ export interface IEffect<T> {
   onHeaderMoveStart: (prop: UniqueIdentifier) => void;
   onHeaderMoveEnd: (prop: UniqueIdentifier) => void;
   onPageChange: (updateParams: { pageIndex: number; pageSize: number }) => void;
+  onTableSync: (syncTableColInfo: IColInfo[]) => void;
   onRowClick: (row: T) => void;
+  onDescSort: (prop: string) => void;
+  onAscSort: (prop: string) => void;
   //暂不做
   setUpdate: (updateParams: IUpdateParams) => void;
 }
@@ -30,7 +40,7 @@ export interface IEffect<T> {
 export interface IATableConfig {
   selectModel?: boolean;
   expand?: boolean;
-  rowKey?: string;
+  rowKey: string;
   subRowsKey?: string;
   showTools?: boolean;
   tools?: (typeof TOOLS)[number][];
@@ -50,5 +60,6 @@ export interface ITableParams<T> {
   selectedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   headerStyle?: (prop: string) => CSSProperties;
+  colSortable?: (prop: string) => boolean;
   style?: CSSProperties;
 }

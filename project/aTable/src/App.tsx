@@ -1,42 +1,38 @@
-import { useATable } from "@ATable/components";
+import { useATable, ColumnDef } from "@ATable/components";
 import "./App.css";
 import { makeData, Person } from "./makeData";
 import { HTMLProps, useEffect, useMemo, useRef, useState } from "react";
 const dataList = [makeData(20, 5, 3), makeData(20, 5, 3)];
 function App() {
-  const columns = useMemo<any[]>(
+  const columns = useMemo<ColumnDef<any, any>[]>(
     () => [
       {
         accessorFn: (row) => row.lastName,
         id: "lastName",
+
         cell: (info) => info.getValue(),
         header: () => <span>Last Name</span>,
-        footer: (props) => props.column.id,
       },
       {
         accessorKey: "age",
         id: "age",
-
+        cell: (info) => info.getValue(),
         header: () => "Age",
-        footer: (props) => props.column.id,
       },
       {
         accessorKey: "visits",
         id: "visits",
         header: () => <span>Visits</span>,
-        footer: (props) => props.column.id,
       },
       {
         accessorKey: "status",
         id: "status",
         header: "Status",
-        footer: (props) => props.column.id,
       },
       {
         accessorKey: "progress",
         id: "progress",
         header: "Profile Progress",
-        footer: (props) => props.column.id,
       },
     ],
     []
@@ -76,6 +72,13 @@ function App() {
 
         data,
         setData,
+        colSortable: () => true,
+        headerStyle: () => ({
+          paddingLeft: "20px",
+        }),
+        cellStyle: () => ({
+          paddingLeft: "20px",
+        }),
         col: columns,
         pageSize,
         pageIndex,
