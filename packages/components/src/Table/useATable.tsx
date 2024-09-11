@@ -1,11 +1,17 @@
-import { useCallback, useReducer, useRef } from "react";
+import { ReactNode, useCallback, useReducer, useRef } from "react";
 import { IATableConfig, IColInfo, IEffect, ITableParams } from "./type.ts";
 import { initialTableState, TableContext, TableReducer } from "./reducer.ts";
 import { TableSlot } from "./TableSlot.tsx";
 import { UniqueIdentifier } from "@dnd-kit/core";
 
 export const useATable = <T,>(tag?: string) => {
-  const effectRef = useRef<{ m: Partial<IEffect<T>> }>({ m: {} });
+  const effectRef = useRef<{
+    m: Partial<IEffect<T>>;
+    p: () => ReactNode | null;
+  }>({
+    m: {},
+    p: () => null,
+  });
   const [state, dispatch] = useReducer(TableReducer, initialTableState);
 
   const onRowSelectionChange = useCallback((rows: T[]) => {
@@ -30,6 +36,7 @@ export const useATable = <T,>(tag?: string) => {
     effectRef.current.m.onTableSync?.(info);
   }, []);
   const onTableAscSort = useCallback((prop: string) => {
+    console.log('cweccewcecec')
     effectRef.current.m.onAscSort?.(prop);
   }, []);
   const onTableDescSort = useCallback((prop: string) => {
@@ -70,6 +77,7 @@ export const useATable = <T,>(tag?: string) => {
               onTableSync={onTableColInfoChange}
               onAscSort={onTableAscSort}
               onDescSort={onTableDescSort}
+              customPagination={effectRef.current.p()}
             />
           ) : (
             <></>
@@ -154,9 +162,15 @@ export const useATable = <T,>(tag?: string) => {
   const onAscSort = useCallback((cb: IEffect<T>["onAscSort"]) => {
     effectRef.current.m.onAscSort = cb;
   }, []);
+
+  const setPagination = useCallback((customPagination: ReactNode) => {
+    effectRef.current.p = () => customPagination;
+  }, []);
+
   return {
     slotBuilder,
     setUpdate,
+    setPagination,
     onHeaderResizeStart,
     onRefreshCallback,
     onHeaderMoveStart,

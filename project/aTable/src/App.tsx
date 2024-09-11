@@ -22,7 +22,9 @@ function App() {
       {
         accessorKey: "visits",
         id: "visits",
-        header: () => <span>Visits</span>,
+        header: () => <span onClick={()=>{
+          console.log('eeeeee')
+        }}>Visits</span>,
       },
       {
         accessorKey: "status",
@@ -41,12 +43,18 @@ function App() {
   const [data, setData] = useState(() => dataList[0]);
   const [pageIndex, setPageIndex] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const { slotBuilder, onSelectChange, onRefreshCallback, onPageChange } =
+  const { slotBuilder, onSelectChange, onRefreshCallback, onAscSort,onDescSort,onPageChange } =
     useATable<Person>("tag");
   console.log(data, "sfdata");
   onRefreshCallback(() => {
     console.log("reweeeeee");
   });
+  onAscSort(()=>{
+    console.log('asdasdasdasd')
+  })
+  onDescSort(()=>{
+    console.log('asdasdasdonDescSortasd')
+  })
   onPageChange(({ pageIndex, pageSize }) => {
     setPageIndex(pageIndex);
     setPageSize(pageSize);

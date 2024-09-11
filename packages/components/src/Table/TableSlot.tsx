@@ -3,6 +3,7 @@ import {
   Fragment,
   HTMLProps,
   memo,
+  ReactNode,
   useCallback,
   useEffect,
   useMemo,
@@ -208,14 +209,15 @@ const DraggableTableHeader = <T,>({
     useSortable({
       id: header.column.id,
     });
-  console.log(isDragging, "isDragging");
+
+  console.log(isDragging, listeners, attributes, "isDrlistenersagging");
   const style: CSSProperties = {
     position: "relative",
     transform: CSS.Translate.toString(transform), // translate instead of transform to avoid squishing
     cursor: isDragging ? "pointer" : "",
     whiteSpace: "nowrap",
     width: header.column.getSize(),
-    zIndex: isDragging ? 4 : 0,
+    zIndex: 111,
   };
 
   const onHandleResizeOver = useCallback(() => {
@@ -246,6 +248,7 @@ const DraggableTableHeader = <T,>({
     React.TouchEventHandler<HTMLDivElement>
   >(
     (e) => {
+      console.log("getExpandedDepth22221");
       e.preventDefault();
       const resizeHandler = header.getResizeHandler();
       resizeHandler(e);
@@ -258,6 +261,7 @@ const DraggableTableHeader = <T,>({
     React.MouseEventHandler<HTMLDivElement>
   >(
     (e) => {
+      console.log("getExpandedDepth2222");
       e.preventDefault();
       const resizeHandler = header.getResizeHandler();
       resizeHandler(e);
@@ -265,7 +269,7 @@ const DraggableTableHeader = <T,>({
     },
     [header, onHeaderResizeStart]
   );
-  console.log(table.getExpandedDepth(), "getExpandedDepth");
+  console.log(table.getExpandedDepth(), attributes, "getExpandedDepth");
   return (
     <div
       {...attributes}
@@ -297,6 +301,9 @@ const DraggableTableHeader = <T,>({
             header.column.id === SELECT_KEY && !expand ? "center" : "",
           position: "relative",
         }}
+        onClick={() => {
+          console.log("ddddddddddddddd");
+        }}
       >
         {header.isPlaceholder
           ? null
@@ -307,20 +314,26 @@ const DraggableTableHeader = <T,>({
               fontSize: "10px",
               zoom: 0.8,
               paddingLeft: "5px",
+              position: "relative",
             }}
           >
             <CaretUpOutlined
               style={{
                 cursor: "pointer",
               }}
-              onClick={() => onAscSort?.(header.column.id)}
+              onClick={() => {
+                console.log("cwcwwcwcwcwcw5555");
+                onAscSort?.(header.column.id);
+              }}
             />
             <CaretDownOutlined
               style={{
                 display: "block",
                 cursor: "pointer",
               }}
-              onClick={() => onDescSort?.(header.column.id)}
+              onClick={() => {
+                onDescSort?.(header.column.id);
+              }}
             />
           </div>
         ) : (
@@ -357,6 +370,7 @@ const DRAGGABLE = 0b10;
 const SYNC = 0b100;
 export const TableSlot = <T,>({
   tableState,
+  customPagination,
   onSelectChange,
   onHeaderMoveEnd,
   onHeaderMoveStart,
@@ -369,6 +383,7 @@ export const TableSlot = <T,>({
   onPageChange,
   onRowClick,
 }: {
+  customPagination?: ReactNode | null;
   tableState: ITableParams<T>;
 } & Omit<IEffect<T>, "setUpdate">) => {
   const selectedRef = useRef<{
@@ -558,7 +573,7 @@ export const TableSlot = <T,>({
       transform: CSS.Translate.toString(transform), // translate instead of transform to avoid squishing
 
       width: cell.column.getSize(),
-      zIndex: isDragging ? 4 : 0,
+      zIndex: isDragging ? 149 : 0,
     };
     console.log(cell, table.getExpandedDepth(), "cellcell");
     return (
@@ -567,7 +582,7 @@ export const TableSlot = <T,>({
         ref={setNodeRef}
         className="a-syn-cell"
         style={{
-          ...(cell.column.id !== SELECT_KEY ? style : { zIndex: 90 }),
+          ...(cell.column.id !== SELECT_KEY ? style : { zIndex: 120 }),
           display: "flex",
           justifyContent:
             cell.column.id === SELECT_KEY && !expand ? "center" : "",
@@ -704,15 +719,23 @@ export const TableSlot = <T,>({
   const handleDragStart = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      console.log(active, over, "ddddsssss");
+      console.log(active, over, event, "ddddsssss");
       onHeaderMoveStart?.(active.id);
     },
     [onHeaderMoveStart]
   );
   const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {})
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {}),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
   );
   const onHandleQuitFilter = useCallback(() => {
     setFilterModel("none");
@@ -1076,54 +1099,58 @@ export const TableSlot = <T,>({
 
         {ctxState.config.hideFooter ? (
           <></>
-        ) : (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: "5px",
-            }}
-          >
+        ) : customPagination ? (
+          <>
             <div
               style={{
-                fontSize: "14px",
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "5px",
               }}
             >
-              {ctxState.config.footer?.includes("total") ||
-              !ctxState.config.footer ? (
-                <>
-                  <span>总计</span>
-                  <span>
-                    {filterModel === "none"
-                      ? total
-                      : Object.keys(rowSelection).length}
-                  </span>
-                </>
-              ) : (
-                <></>
-              )}
+              <div
+                style={{
+                  fontSize: "14px",
+                }}
+              >
+                {ctxState.config.footer?.includes("total") ||
+                !ctxState.config.footer ? (
+                  <>
+                    <span>总计</span>
+                    <span>
+                      {filterModel === "none"
+                        ? total
+                        : Object.keys(rowSelection).length}
+                    </span>
+                  </>
+                ) : (
+                  <></>
+                )}
+              </div>
+              <Pagination
+                size="small"
+                total={total}
+                showSizeChanger={
+                  ctxState.config.footer?.includes("size") ||
+                  !ctxState.config.footer
+                }
+                showQuickJumper={
+                  ctxState.config.footer?.includes("jump") ||
+                  !ctxState.config.footer
+                }
+                current={pageIndex}
+                pageSize={pageSize}
+                onChange={(pageIndex, pageSize) =>
+                  onPageChange({
+                    pageIndex,
+                    pageSize,
+                  })
+                }
+              />
             </div>
-            <Pagination
-              size="small"
-              total={total}
-              showSizeChanger={
-                ctxState.config.footer?.includes("size") ||
-                !ctxState.config.footer
-              }
-              showQuickJumper={
-                ctxState.config.footer?.includes("jump") ||
-                !ctxState.config.footer
-              }
-              current={pageIndex}
-              pageSize={pageSize}
-              onChange={(pageIndex, pageSize) =>
-                onPageChange({
-                  pageIndex,
-                  pageSize,
-                })
-              }
-            />
-          </div>
+          </>
+        ) : (
+          <></>
         )}
       </div>
     </DndContext>
