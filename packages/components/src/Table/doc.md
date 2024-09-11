@@ -88,8 +88,8 @@ export interface ITableParams<T> {
   pageSize: number;
   loading?: boolean;
   total: number;
-  clickedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
-  selectedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
+  clickedRowKeyList?: (() => unknown[]) | unknown[];
+  selectedRowKeyList?: (() => unknown[]) | unknown[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   headerStyle?: (prop: string) => CSSProperties;
   style?: CSSProperties;

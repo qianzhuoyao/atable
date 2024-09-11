@@ -72,8 +72,8 @@ function App() {
 
         data,
         setData,
-        selectedRowKeyList:(rows)=>{
-          return rows.map(i=>{
+        selectedRowKeyList:()=>{
+          return data.map(i=>{
             if(i.age>10){
               return i.id
             }

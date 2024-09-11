@@ -145,12 +145,12 @@ const ColVisibleContent = <T,>({ table }: { table: Table<T> }) => {
           全部
         </label>
       </div>
-      {table.getAllLeafColumns().map((column) => {
+      {table.getAllLeafColumns().map((column, index) => {
         if (column.id === SELECT_KEY) {
-          return <Fragment key={column.id}></Fragment>;
+          return <Fragment key={column.id + "-c-" + index}></Fragment>;
         }
         return (
-          <div key={column.id}>
+          <div key={column.id + "-c-" + index}>
             <label>
               <input
                 {...{
@@ -271,7 +271,7 @@ const DraggableTableHeader = <T,>({
       {...attributes}
       {...(header.column.id !== SELECT_KEY ? listeners : {})}
       ref={setNodeRef}
-      key={header.id}
+      key={header.id + "-dh-"}
       style={{
         ...(header.column.id !== SELECT_KEY ? style : { zIndex: 200 }),
         height: "100%",
@@ -373,20 +373,13 @@ export const TableSlot = <T,>({
 } & Omit<IEffect<T>, "setUpdate">) => {
   const selectedRef = useRef<{
     //跨业选中
-    pageCache: RowSelectionState;
+    pageCache: Record<string, T[]>;
     //跨业所有数据
     pageList: Record<string, T[]>;
   }>({
     pageCache: {},
     pageList: {},
   });
-  const { state: ctxState } = useTableContext();
-  const [columnSizing, setColumnSizing] = useState({});
-  const [clickedRows, setClickedRows] = useState<unknown[]>([]);
-  const [filterModel, setFilterModel] = useState<"none" | "selected">("none");
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
   const {
     col,
     data,
@@ -402,6 +395,39 @@ export const TableSlot = <T,>({
     loading,
     style,
   } = tableState;
+  const { state: ctxState } = useTableContext();
+  const [columnSizing, setColumnSizing] = useState({});
+  const [clickedRows, setClickedRows] = useState<unknown[]>(() => {
+    const tableClickedRowKeyList: unknown[] | undefined =
+      typeof clickedRowKeyList === "function"
+        ? clickedRowKeyList()
+        : clickedRowKeyList;
+
+    return tableClickedRowKeyList || [];
+  });
+  const [filterModel, setFilterModel] = useState<"none" | "selected">("none");
+  const [columnVisibility, setColumnVisibility] = useState({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>(() => {
+    console.log("d3wdfff");
+    const selectRowKeyList: unknown[] | undefined =
+      typeof selectedRowKeyList === "function"
+        ? selectedRowKeyList()
+        : selectedRowKeyList;
+
+    const key = ctxState.config?.rowKey;
+    if (!key) {
+      return {};
+    }
+    const selection: RowSelectionState = {};
+    selectRowKeyList?.map((rowKey) => {
+      if (ctxState.config.rowKey && typeof rowKey === "string") {
+        selection[rowKey] = true;
+      }
+    });
+
+    return selection;
+  });
+  const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
 
   const checkData = useMemo(() => data || [], [data]);
 
@@ -529,7 +555,7 @@ export const TableSlot = <T,>({
     console.log(cell, table.getExpandedDepth(), "cellcell");
     return (
       <div
-        key={cell.id}
+        key={cell.id + "-dc-"}
         ref={setNodeRef}
         className="a-syn-cell"
         style={{
@@ -603,66 +629,24 @@ export const TableSlot = <T,>({
     debugHeaders: false,
     debugColumns: false,
   });
-  console.log(rowSelection, "table.getRowModel().rows");
 
   useEffect(() => {
-    const tableClickedRowKeyList: unknown[] | undefined =
-      typeof clickedRowKeyList === "function"
-        ? clickedRowKeyList(table.getRowModel().rows.map((row) => row.original))
-        : clickedRowKeyList;
-
-    setClickedRows(() => {
-      return tableClickedRowKeyList || [];
-    });
-  }, [clickedRowKeyList, table]);
+    console.log(table.getSelectedRowModel(), "getSelectedRowModel");
+    selectedRef.current.pageCache[pageIndex] = table
+      .getSelectedRowModel()
+      .flatRows.map((f) => f.original);
+  }, [checkData, ctxState.config.rowKey, pageIndex, rowSelection, table]);
 
   useEffect(() => {
-    selectedRef.current.pageCache = {
-      ...selectedRef.current.pageCache,
-      ...rowSelection,
-    };
-  }, [rowSelection]);
-
-  useEffect(() => {
-    onSelectChange?.(
-      Object.keys(selectedRef.current.pageCache).map((key) => {
-        return table.getRow(key).original;
-      })
-    );
-  }, [onSelectChange, table]);
-
-  useEffect(() => {
-    console.log("d3wdfff");
-    const selectRowKeyList: unknown[] | undefined =
-      typeof selectedRowKeyList === "function"
-        ? selectedRowKeyList(
-            table.getRowModel().rows.map((row) => row.original)
-          )
-        : selectedRowKeyList;
-
-    setRowSelection(() => {
-      const key = ctxState.config?.rowKey;
-      if (!key) {
-        return {};
-      }
-      const selection: RowSelectionState = {};
-      table.getRowModel().rows?.map((row) => {
-        if (
-          ctxState.config.rowKey &&
-          row.original &&
-          selectRowKeyList?.includes(
-            (row.original as Record<string, unknown>)[key]
-          )
-        ) {
-          selection[
-            (row.original as Record<string, string>)[ctxState.config.rowKey]
-          ] = true;
-        }
+    console.log(rowSelection, "table.getRowModel().rows");
+    const result: T[] = [];
+    Object.values(selectedRef.current.pageCache).map((pageItem) => {
+      pageItem.map((item) => {
+        result.push(item);
       });
-
-      return selection;
     });
-  }, [ctxState.config.rowKey, selectedRowKeyList, table]);
+    onSelectChange?.(result);
+  }, [onSelectChange, rowSelection]);
 
   console.log(
     checkData,
@@ -974,9 +958,9 @@ export const TableSlot = <T,>({
                 borderBottom: "1px solid rgba(229, 229, 229, 1)",
               }}
             >
-              {table.getHeaderGroups().map((headerGroup) => (
+              {table.getHeaderGroups().map((headerGroup, index) => (
                 <div
-                  key={headerGroup.id}
+                  key={headerGroup.id + "-hg-" + index}
                   style={{
                     display: "flex",
                     height: "36px",
@@ -987,9 +971,9 @@ export const TableSlot = <T,>({
                     items={columnOrder}
                     strategy={horizontalListSortingStrategy}
                   >
-                    {headerGroup.headers.map((header) => (
+                    {headerGroup.headers.map((header, index) => (
                       <DraggableTableHeader
-                        key={header.id}
+                        key={header.id + "-h-" + index}
                         table={table}
                         onAscSort={onAscSort}
                         onDescSort={onDescSort}
@@ -1015,10 +999,10 @@ export const TableSlot = <T,>({
                 width: "100%",
               }}
             >
-              {table.getRowModel().rows.map((row) => {
+              {table.getRowModel().rows.map((row, index) => {
                 return (
                   <div
-                    key={row.id}
+                    key={row.id + "-m-" + index}
                     className="a-syn-row"
                     style={{
                       display:
@@ -1042,14 +1026,14 @@ export const TableSlot = <T,>({
                     }}
                     onClick={() => onHandleClickRow(row.original)}
                   >
-                    {row.getVisibleCells().map((cell) => (
+                    {row.getVisibleCells().map((cell, index) => (
                       <SortableContext
-                        key={cell.id}
+                        key={cell.id + "-s-" + index}
                         items={columnOrder}
                         strategy={horizontalListSortingStrategy}
                       >
                         <DragAlongCell<T>
-                          key={cell.id}
+                          key={cell.id + "-d-" + index}
                           cell={cell}
                           expand={ctxState.config.expand}
                         />

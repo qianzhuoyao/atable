@@ -56,8 +56,8 @@ export interface ITableParams<T> {
   pageSize: number;
   loading?: boolean;
   total: number;
-  clickedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
-  selectedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
+  clickedRowKeyList?: (() => (string|undefined)[]) | (string|undefined)[];
+  selectedRowKeyList?: (() => (string|undefined)[]) | (string|undefined)[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   headerStyle?: (prop: string) => CSSProperties;
   colSortable?: (prop: string) => boolean;
