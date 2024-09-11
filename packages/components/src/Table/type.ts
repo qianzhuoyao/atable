@@ -2,6 +2,8 @@ import { UniqueIdentifier } from "@dnd-kit/core";
 import { ColumnDef } from "@tanstack/react-table";
 import { CSSProperties } from "react";
 
+export const FOOTER = ["jump", "size", "total"] as const;
+
 export const TOOLS = [
   "refresh",
   "colVisible",
@@ -46,6 +48,7 @@ export interface IATableConfig {
   tools?: (typeof TOOLS)[number][];
   showSelectedInfo?: boolean;
   hideFooter?: boolean;
+  footer?: (typeof FOOTER)[number][];
 }
 
 export interface ITableParams<T> {
@@ -60,7 +63,7 @@ export interface ITableParams<T> {
   selectedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   headerStyle?: (prop: string) => CSSProperties;
-  rowStyle?:(row: T) => CSSProperties;
+  rowStyle?: (row: T, index: number) => CSSProperties;
   colSortable?: (prop: string) => boolean;
   rowSelectDisable?: (row: T) => boolean;
   style?: CSSProperties;

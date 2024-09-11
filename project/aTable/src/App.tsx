@@ -58,6 +58,7 @@ function App() {
     expand: true,
     showSelectedInfo: true,
     rowKey: "id",
+    footer:['total']
   });
   onSelectChange((e) => {
     console.log(e, "defgggggg");

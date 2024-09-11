@@ -1031,7 +1031,7 @@ export const TableSlot = <T,>({
                         : row.getIsSelected()
                         ? "rgba(54, 122, 228, 0.15)"
                         : "",
-                      ...rowStyle?.(row.original),
+                      ...rowStyle?.(row.original, row.index),
                     }}
                     onClick={() => onHandleClickRow(row.original)}
                   >
@@ -1089,18 +1089,31 @@ export const TableSlot = <T,>({
                 fontSize: "14px",
               }}
             >
-              <span>总计</span>
-              <span>
-                {filterModel === "none"
-                  ? total
-                  : Object.keys(rowSelection).length}
-              </span>
+              {ctxState.config.footer?.includes("total") ||
+              !ctxState.config.footer ? (
+                <>
+                  <span>总计</span>
+                  <span>
+                    {filterModel === "none"
+                      ? total
+                      : Object.keys(rowSelection).length}
+                  </span>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
             <Pagination
               size="small"
               total={total}
-              showSizeChanger
-              showQuickJumper
+              showSizeChanger={
+                ctxState.config.footer?.includes("size") ||
+                !ctxState.config.footer
+              }
+              showQuickJumper={
+                ctxState.config.footer?.includes("jump") ||
+                !ctxState.config.footer
+              }
               current={pageIndex}
               pageSize={pageSize}
               onChange={(pageIndex, pageSize) =>

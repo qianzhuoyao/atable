@@ -197,6 +197,8 @@ export interface ITableParams<T> {
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   //表头样式
   headerStyle?: (prop: string) => CSSProperties;
+  //行样式
+  rowStyle?: (row: T, index: number) => CSSProperties;
   //表格样式，不处理width height
   style?: CSSProperties;
   //行是否禁用
