@@ -388,7 +388,9 @@ export const TableSlot = <T,>({
     total,
     setData,
     selectedRowKeyList,
+    rowSelectDisable,
     clickedRowKeyList,
+    rowStyle,
     cellStyle,
     colSortable,
     headerStyle,
@@ -462,6 +464,7 @@ export const TableSlot = <T,>({
               >
                 <IndeterminateCheckbox
                   {...{
+                    disabled: rowSelectDisable?.(row.original),
                     checked:
                       row.getIsSelected() || row.getIsAllSubRowsSelected(),
                     indeterminate: row.getIsSomeSelected(),
@@ -493,7 +496,12 @@ export const TableSlot = <T,>({
       }
     }
     return col;
-  }, [col, ctxState.config.expand, ctxState.config.selectModel]);
+  }, [
+    col,
+    ctxState.config.expand,
+    ctxState.config.selectModel,
+    rowSelectDisable,
+  ]);
 
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [columnResizeMode] = useState<ColumnResizeMode>("onChange");
@@ -1023,6 +1031,7 @@ export const TableSlot = <T,>({
                         : row.getIsSelected()
                         ? "rgba(54, 122, 228, 0.15)"
                         : "",
+                      ...rowStyle?.(row.original),
                     }}
                     onClick={() => onHandleClickRow(row.original)}
                   >

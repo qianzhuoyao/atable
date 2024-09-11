@@ -49,8 +49,7 @@
           data,
           //表头
           col,
-          //选中项
-          select,
+
           setData,
           pageIndex,
           total,
@@ -191,14 +190,16 @@ export interface ITableParams<T> {
   //总数
   total: number;
   //点击项
-  clickedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
+  clickedRowKeyList?: (() => unknown[]) | unknown[];
   //勾选项
-  selectedRowKeyList?: ((row: T[]) => unknown[]) | unknown[];
+  selectedRowKeyList?: (() => unknown[]) | unknown[];
   //单元格样式
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   //表头样式
   headerStyle?: (prop: string) => CSSProperties;
   //表格样式，不处理width height
   style?: CSSProperties;
+  //行是否禁用
+  rowSelectDisable?: (row: T) => boolean;
 }
 ```

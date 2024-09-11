@@ -56,10 +56,12 @@ export interface ITableParams<T> {
   pageSize: number;
   loading?: boolean;
   total: number;
-  clickedRowKeyList?: (() => (string|undefined)[]) | (string|undefined)[];
-  selectedRowKeyList?: (() => (string|undefined)[]) | (string|undefined)[];
+  clickedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
+  selectedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   headerStyle?: (prop: string) => CSSProperties;
+  rowStyle?:(row: T) => CSSProperties;
   colSortable?: (prop: string) => boolean;
+  rowSelectDisable?: (row: T) => boolean;
   style?: CSSProperties;
 }
