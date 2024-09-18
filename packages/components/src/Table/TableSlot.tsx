@@ -131,7 +131,13 @@ const HeaderCheckBox = <T,>({
   );
 };
 
-const ColVisibleContent = <T,>({ table }: { table: Table<T> }) => {
+const ColVisibleContent = <T,>({
+  table,
+  popupColHidden,
+}: {
+  table: Table<T>;
+  popupColHidden?: (prop: string) => boolean;
+}) => {
   return (
     <>
       <div>
@@ -150,7 +156,7 @@ const ColVisibleContent = <T,>({ table }: { table: Table<T> }) => {
         if (column.id === SELECT_KEY) {
           return <Fragment key={column.id + "-c-" + index}></Fragment>;
         }
-        return (
+        return !popupColHidden?.(column.id) ? (
           <div key={column.id + "-c-" + index}>
             <label>
               <input
@@ -169,6 +175,8 @@ const ColVisibleContent = <T,>({ table }: { table: Table<T> }) => {
                 : column.columnDef.header}
             </label>
           </div>
+        ) : (
+          <></>
         );
       })}
     </>
@@ -407,6 +415,7 @@ export const TableSlot = <T,>({
     clickedRowKeyList,
     rowStyle,
     cellStyle,
+    popupColHidden,
     colSortable,
     headerStyle,
     loading,
@@ -916,7 +925,12 @@ export const TableSlot = <T,>({
                     ctxState.config.tools.includes("colVisible") ? (
                       <Popover
                         placement="bottom"
-                        content={<ColVisibleContent table={table} />}
+                        content={
+                          <ColVisibleContent
+                            popupColHidden={popupColHidden}
+                            table={table}
+                          />
+                        }
                       >
                         <AppstoreOutlined
                           style={{
@@ -1034,6 +1048,11 @@ export const TableSlot = <T,>({
                 return (
                   <div
                     key={row.id + "-m-" + index}
+                    id={
+                      (row.original as Record<string, string>)[
+                        ctxState.config.rowKey || ""
+                      ]
+                    }
                     className="a-syn-row"
                     style={{
                       display:

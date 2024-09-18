@@ -65,6 +65,7 @@ export interface ITableParams<T> {
   headerStyle?: (prop: string) => CSSProperties;
   rowStyle?: (row: T, index: number) => CSSProperties;
   colSortable?: (prop: string) => boolean;
+  popupColHidden?: (prop: string) => boolean;
   rowSelectDisable?: (row: T) => boolean;
   style?: CSSProperties;
 }

@@ -36,7 +36,7 @@ export const useATable = <T,>(tag?: string) => {
     effectRef.current.m.onTableSync?.(info);
   }, []);
   const onTableAscSort = useCallback((prop: string) => {
-    console.log('cweccewcecec')
+    console.log("cweccewcecec");
     effectRef.current.m.onAscSort?.(prop);
   }, []);
   const onTableDescSort = useCallback((prop: string) => {
@@ -56,7 +56,6 @@ export const useATable = <T,>(tag?: string) => {
   const onColHeaderMoveEnd = useCallback((prop: UniqueIdentifier) => {
     effectRef.current.m.onHeaderMoveEnd?.(prop);
   }, []);
-
   const TableCreator = useCallback(
     (tableState: ITableParams<T>, config: IATableConfig) => {
       return (
@@ -162,7 +161,9 @@ export const useATable = <T,>(tag?: string) => {
   const onAscSort = useCallback((cb: IEffect<T>["onAscSort"]) => {
     effectRef.current.m.onAscSort = cb;
   }, []);
-
+  const scrollTo = (rowKey: string) => {
+    document.getElementById(rowKey)?.scrollIntoView({behavior: "smooth"});
+  };
   const setPagination = useCallback((customPagination: ReactNode) => {
     effectRef.current.p = () => customPagination;
   }, []);
@@ -171,6 +172,7 @@ export const useATable = <T,>(tag?: string) => {
     slotBuilder,
     setUpdate,
     setPagination,
+    scrollTo,
     onHeaderResizeStart,
     onRefreshCallback,
     onHeaderMoveStart,

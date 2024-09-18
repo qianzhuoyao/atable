@@ -145,6 +145,8 @@ export interface IEffect<T> {
   onTableSync: (syncTableColInfo: IColInfo[]) => void;
   //行点击
   onRowClick: (row: T) => void;
+  //设置可视行
+  scrollTo: (rowKey: string) => void;
 }
 ```
 
