@@ -11,7 +11,7 @@ const dataList = [
     visits: 947,
     progress: 95,
     status: "relationship",
-    subRows: [
+    children: [
       {
         firstName: "Mozelle",
         lastName: "Ritchie",
@@ -20,7 +20,7 @@ const dataList = [
         visits: 766,
         progress: 26,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Murray",
             lastName: "Mertz",
@@ -58,7 +58,7 @@ const dataList = [
         visits: 602,
         progress: 66,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Marie",
             lastName: "Walter",
@@ -96,7 +96,7 @@ const dataList = [
         visits: 332,
         progress: 60,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Creola",
             lastName: "Quigley",
@@ -134,7 +134,7 @@ const dataList = [
         visits: 507,
         progress: 36,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Alva",
             lastName: "Gottlieb",
@@ -172,7 +172,7 @@ const dataList = [
         visits: 814,
         progress: 84,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Madelynn",
             lastName: "Schowalter",
@@ -212,7 +212,7 @@ const dataList = [
     visits: 564,
     progress: 82,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Abraham",
         lastName: "Schroeder",
@@ -221,7 +221,7 @@ const dataList = [
         visits: 596,
         progress: 81,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Savanna",
             lastName: "Rosenbaum",
@@ -259,7 +259,7 @@ const dataList = [
         visits: 425,
         progress: 30,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Alexa",
             lastName: "Monahan",
@@ -297,7 +297,7 @@ const dataList = [
         visits: 284,
         progress: 84,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Warren",
             lastName: "Ritchie",
@@ -335,7 +335,7 @@ const dataList = [
         visits: 909,
         progress: 58,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Milan",
             lastName: "Block",
@@ -373,7 +373,7 @@ const dataList = [
         visits: 205,
         progress: 67,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Carol",
             lastName: "Reichel",
@@ -413,7 +413,7 @@ const dataList = [
     visits: 267,
     progress: 66,
     status: "single",
-    subRows: [
+    children: [
       {
         firstName: "Haleigh",
         lastName: "Armstrong",
@@ -422,7 +422,7 @@ const dataList = [
         visits: 401,
         progress: 87,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Micaela",
             lastName: "Streich",
@@ -460,7 +460,7 @@ const dataList = [
         visits: 449,
         progress: 49,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Raphael",
             lastName: "Bauch",
@@ -498,7 +498,7 @@ const dataList = [
         visits: 55,
         progress: 88,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Doris",
             lastName: "Aufderhar",
@@ -536,7 +536,7 @@ const dataList = [
         visits: 760,
         progress: 24,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Alfonso",
             lastName: "Nikolaus",
@@ -574,7 +574,7 @@ const dataList = [
         visits: 786,
         progress: 84,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Zena",
             lastName: "Schiller",
@@ -614,7 +614,7 @@ const dataList = [
     visits: 652,
     progress: 41,
     status: "relationship",
-    subRows: [
+    children: [
       {
         firstName: "Santa",
         lastName: "Farrell",
@@ -623,7 +623,7 @@ const dataList = [
         visits: 312,
         progress: 47,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Bernardo",
             lastName: "Kohler",
@@ -661,7 +661,7 @@ const dataList = [
         visits: 420,
         progress: 15,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Richard",
             lastName: "Bailey",
@@ -699,7 +699,7 @@ const dataList = [
         visits: 98,
         progress: 90,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Syble",
             lastName: "Lemke",
@@ -737,7 +737,7 @@ const dataList = [
         visits: 734,
         progress: 86,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Merritt",
             lastName: "Harris",
@@ -775,7 +775,7 @@ const dataList = [
         visits: 560,
         progress: 39,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Katherine",
             lastName: "Herman",
@@ -815,7 +815,7 @@ const dataList = [
     visits: 659,
     progress: 35,
     status: "single",
-    subRows: [
+    children: [
       {
         firstName: "Moses",
         lastName: "Mertz",
@@ -824,7 +824,7 @@ const dataList = [
         visits: 699,
         progress: 37,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Amalia",
             lastName: "Kuhlman",
@@ -862,7 +862,7 @@ const dataList = [
         visits: 966,
         progress: 57,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Reyna",
             lastName: "Lebsack",
@@ -900,7 +900,7 @@ const dataList = [
         visits: 778,
         progress: 25,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Dorcas",
             lastName: "McCullough",
@@ -938,7 +938,7 @@ const dataList = [
         visits: 494,
         progress: 11,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Clyde",
             lastName: "Cronin",
@@ -976,7 +976,7 @@ const dataList = [
         visits: 168,
         progress: 68,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Shanelle",
             lastName: "Pfannerstill",
@@ -1016,7 +1016,7 @@ const dataList = [
     visits: 337,
     progress: 19,
     status: "single",
-    subRows: [
+    children: [
       {
         firstName: "Kolby",
         lastName: "Deckow",
@@ -1025,7 +1025,7 @@ const dataList = [
         visits: 437,
         progress: 54,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Deron",
             lastName: "Lind",
@@ -1063,7 +1063,7 @@ const dataList = [
         visits: 983,
         progress: 64,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Berry",
             lastName: "Kirlin",
@@ -1101,7 +1101,7 @@ const dataList = [
         visits: 826,
         progress: 56,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Dasia",
             lastName: "Satterfield",
@@ -1139,7 +1139,7 @@ const dataList = [
         visits: 410,
         progress: 87,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Miles",
             lastName: "Kuvalis",
@@ -1177,7 +1177,7 @@ const dataList = [
         visits: 899,
         progress: 17,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Anabelle",
             lastName: "Rodriguez",
@@ -1217,7 +1217,7 @@ const dataList = [
     visits: 252,
     progress: 63,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Judd",
         lastName: "Cassin",
@@ -1226,7 +1226,7 @@ const dataList = [
         visits: 900,
         progress: 72,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Kristofer",
             lastName: "Welch",
@@ -1264,7 +1264,7 @@ const dataList = [
         visits: 77,
         progress: 10,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Jacinto",
             lastName: "Mayert",
@@ -1302,7 +1302,7 @@ const dataList = [
         visits: 747,
         progress: 0,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Clinton",
             lastName: "Marvin",
@@ -1340,7 +1340,7 @@ const dataList = [
         visits: 930,
         progress: 27,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Domingo",
             lastName: "Bernhard",
@@ -1378,7 +1378,7 @@ const dataList = [
         visits: 129,
         progress: 79,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Tobin",
             lastName: "Schaden",
@@ -1418,7 +1418,7 @@ const dataList = [
     visits: 556,
     progress: 68,
     status: "relationship",
-    subRows: [
+    children: [
       {
         firstName: "Georgiana",
         lastName: "Haley",
@@ -1427,7 +1427,7 @@ const dataList = [
         visits: 202,
         progress: 25,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Cora",
             lastName: "Runolfsson",
@@ -1465,7 +1465,7 @@ const dataList = [
         visits: 305,
         progress: 56,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Abigale",
             lastName: "Bashirian",
@@ -1503,7 +1503,7 @@ const dataList = [
         visits: 546,
         progress: 63,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Mohammad",
             lastName: "Kerluke-Mayert",
@@ -1541,7 +1541,7 @@ const dataList = [
         visits: 16,
         progress: 59,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Louie",
             lastName: "Miller",
@@ -1579,7 +1579,7 @@ const dataList = [
         visits: 752,
         progress: 74,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Mittie",
             lastName: "Zieme",
@@ -1619,7 +1619,7 @@ const dataList = [
     visits: 869,
     progress: 25,
     status: "relationship",
-    subRows: [
+    children: [
       {
         firstName: "Elyssa",
         lastName: "Berge",
@@ -1628,7 +1628,7 @@ const dataList = [
         visits: 199,
         progress: 98,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Hobart",
             lastName: "Swift",
@@ -1666,7 +1666,7 @@ const dataList = [
         visits: 333,
         progress: 26,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Abdul",
             lastName: "Reynolds",
@@ -1704,7 +1704,7 @@ const dataList = [
         visits: 236,
         progress: 70,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Bennie",
             lastName: "Bartell",
@@ -1742,7 +1742,7 @@ const dataList = [
         visits: 190,
         progress: 31,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Marguerite",
             lastName: "Lesch",
@@ -1780,7 +1780,7 @@ const dataList = [
         visits: 508,
         progress: 74,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Charlene",
             lastName: "Ullrich",
@@ -1820,7 +1820,7 @@ const dataList = [
     visits: 951,
     progress: 28,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Precious",
         lastName: "Fay",
@@ -1829,7 +1829,7 @@ const dataList = [
         visits: 329,
         progress: 76,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Jovani",
             lastName: "Carroll",
@@ -1867,7 +1867,7 @@ const dataList = [
         visits: 96,
         progress: 89,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Brennan",
             lastName: "Bogisich",
@@ -1905,7 +1905,7 @@ const dataList = [
         visits: 444,
         progress: 98,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Dangelo",
             lastName: "Jenkins",
@@ -1943,7 +1943,7 @@ const dataList = [
         visits: 852,
         progress: 45,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Ole",
             lastName: "Batz",
@@ -1981,7 +1981,7 @@ const dataList = [
         visits: 639,
         progress: 35,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Chelsie",
             lastName: "Cummings",
@@ -2021,7 +2021,7 @@ const dataList = [
     visits: 816,
     progress: 49,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Francis",
         lastName: "Schiller",
@@ -2030,7 +2030,7 @@ const dataList = [
         visits: 635,
         progress: 39,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Josianne",
             lastName: "Pacocha",
@@ -2068,7 +2068,7 @@ const dataList = [
         visits: 918,
         progress: 85,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Gideon",
             lastName: "Daniel",
@@ -2106,7 +2106,7 @@ const dataList = [
         visits: 539,
         progress: 66,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Jaunita",
             lastName: "Nienow",
@@ -2144,7 +2144,7 @@ const dataList = [
         visits: 281,
         progress: 44,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Marina",
             lastName: "Fadel",
@@ -2182,7 +2182,7 @@ const dataList = [
         visits: 877,
         progress: 71,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Mabelle",
             lastName: "Walsh",
@@ -2222,7 +2222,7 @@ const dataList = [
     visits: 587,
     progress: 62,
     status: "relationship",
-    subRows: [
+    children: [
       {
         firstName: "Abdul",
         lastName: "Considine",
@@ -2231,7 +2231,7 @@ const dataList = [
         visits: 216,
         progress: 83,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Ashtyn",
             lastName: "Hand",
@@ -2269,7 +2269,7 @@ const dataList = [
         visits: 65,
         progress: 28,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Katlynn",
             lastName: "Romaguera",
@@ -2307,7 +2307,7 @@ const dataList = [
         visits: 767,
         progress: 9,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Lemuel",
             lastName: "Nienow",
@@ -2345,7 +2345,7 @@ const dataList = [
         visits: 279,
         progress: 39,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Colby",
             lastName: "Ritchie",
@@ -2383,7 +2383,7 @@ const dataList = [
         visits: 601,
         progress: 65,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Cathy",
             lastName: "Keeling",
@@ -2423,7 +2423,7 @@ const dataList = [
     visits: 709,
     progress: 87,
     status: "single",
-    subRows: [
+    children: [
       {
         firstName: "Savanna",
         lastName: "Marks",
@@ -2432,7 +2432,7 @@ const dataList = [
         visits: 320,
         progress: 67,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Fred",
             lastName: "Cassin-Lind",
@@ -2470,7 +2470,7 @@ const dataList = [
         visits: 223,
         progress: 4,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Roslyn",
             lastName: "Crona",
@@ -2508,7 +2508,7 @@ const dataList = [
         visits: 323,
         progress: 64,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Queenie",
             lastName: "Mante",
@@ -2546,7 +2546,7 @@ const dataList = [
         visits: 343,
         progress: 96,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Stacey",
             lastName: "Koch",
@@ -2584,7 +2584,7 @@ const dataList = [
         visits: 823,
         progress: 41,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Adrianna",
             lastName: "Walsh",
@@ -2624,7 +2624,7 @@ const dataList = [
     visits: 960,
     progress: 17,
     status: "single",
-    subRows: [
+    children: [
       {
         firstName: "Adolph",
         lastName: "Zboncak",
@@ -2633,7 +2633,7 @@ const dataList = [
         visits: 715,
         progress: 54,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Maegan",
             lastName: "Greenholt",
@@ -2671,7 +2671,7 @@ const dataList = [
         visits: 616,
         progress: 77,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Terry",
             lastName: "Bahringer",
@@ -2709,7 +2709,7 @@ const dataList = [
         visits: 325,
         progress: 64,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Ellie",
             lastName: "Glover",
@@ -2747,7 +2747,7 @@ const dataList = [
         visits: 778,
         progress: 28,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Margret",
             lastName: "Hudson",
@@ -2785,7 +2785,7 @@ const dataList = [
         visits: 789,
         progress: 11,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Janiya",
             lastName: "Rogahn",
@@ -2825,7 +2825,7 @@ const dataList = [
     visits: 995,
     progress: 93,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Don",
         lastName: "O'Conner",
@@ -2834,7 +2834,7 @@ const dataList = [
         visits: 92,
         progress: 4,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Gail",
             lastName: "Brown",
@@ -2872,7 +2872,7 @@ const dataList = [
         visits: 858,
         progress: 89,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Cassandra",
             lastName: "Funk",
@@ -2910,7 +2910,7 @@ const dataList = [
         visits: 561,
         progress: 36,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Cassandre",
             lastName: "Pfeffer",
@@ -2948,7 +2948,7 @@ const dataList = [
         visits: 41,
         progress: 5,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Astrid",
             lastName: "Ward",
@@ -2986,7 +2986,7 @@ const dataList = [
         visits: 732,
         progress: 89,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Ryan",
             lastName: "Walker",
@@ -3026,7 +3026,7 @@ const dataList = [
     visits: 627,
     progress: 27,
     status: "single",
-    subRows: [
+    children: [
       {
         firstName: "Willie",
         lastName: "Hegmann",
@@ -3035,7 +3035,7 @@ const dataList = [
         visits: 838,
         progress: 18,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Reina",
             lastName: "Frami",
@@ -3073,7 +3073,7 @@ const dataList = [
         visits: 187,
         progress: 10,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Rosalee",
             lastName: "Dickens",
@@ -3111,7 +3111,7 @@ const dataList = [
         visits: 557,
         progress: 98,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Cheyanne",
             lastName: "Durgan",
@@ -3149,7 +3149,7 @@ const dataList = [
         visits: 390,
         progress: 8,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Macey",
             lastName: "Rogahn",
@@ -3187,7 +3187,7 @@ const dataList = [
         visits: 928,
         progress: 13,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Jacky",
             lastName: "Goyette",
@@ -3227,7 +3227,7 @@ const dataList = [
     visits: 545,
     progress: 18,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Felipa",
         lastName: "Konopelski",
@@ -3236,7 +3236,7 @@ const dataList = [
         visits: 764,
         progress: 52,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Helmer",
             lastName: "Kiehn",
@@ -3274,7 +3274,7 @@ const dataList = [
         visits: 151,
         progress: 93,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Lafayette",
             lastName: "Emmerich",
@@ -3312,7 +3312,7 @@ const dataList = [
         visits: 278,
         progress: 2,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Carmen",
             lastName: "Medhurst",
@@ -3350,7 +3350,7 @@ const dataList = [
         visits: 353,
         progress: 4,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Deven",
             lastName: "Toy",
@@ -3388,7 +3388,7 @@ const dataList = [
         visits: 713,
         progress: 25,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Delphia",
             lastName: "Kub",
@@ -3428,7 +3428,7 @@ const dataList = [
     visits: 119,
     progress: 38,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Vidal",
         lastName: "Marquardt",
@@ -3437,7 +3437,7 @@ const dataList = [
         visits: 491,
         progress: 20,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Jocelyn",
             lastName: "Mayert",
@@ -3475,7 +3475,7 @@ const dataList = [
         visits: 419,
         progress: 57,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Athena",
             lastName: "Kunze",
@@ -3513,7 +3513,7 @@ const dataList = [
         visits: 740,
         progress: 60,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Ford",
             lastName: "Frami",
@@ -3551,7 +3551,7 @@ const dataList = [
         visits: 214,
         progress: 68,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Nasir",
             lastName: "Krajcik",
@@ -3589,7 +3589,7 @@ const dataList = [
         visits: 874,
         progress: 100,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Colleen",
             lastName: "Nicolas",
@@ -3629,7 +3629,7 @@ const dataList = [
     visits: 971,
     progress: 82,
     status: "complicated",
-    subRows: [
+    children: [
       {
         firstName: "Lera",
         lastName: "Little-Connelly",
@@ -3638,7 +3638,7 @@ const dataList = [
         visits: 590,
         progress: 83,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Guiseppe",
             lastName: "Jakubowski",
@@ -3676,7 +3676,7 @@ const dataList = [
         visits: 185,
         progress: 5,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Ludwig",
             lastName: "Lubowitz",
@@ -3714,7 +3714,7 @@ const dataList = [
         visits: 939,
         progress: 70,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Tyree",
             lastName: "Swift",
@@ -3752,7 +3752,7 @@ const dataList = [
         visits: 682,
         progress: 68,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Abdullah",
             lastName: "Volkman",
@@ -3790,7 +3790,7 @@ const dataList = [
         visits: 592,
         progress: 97,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Brendan",
             lastName: "Reilly",
@@ -3830,7 +3830,7 @@ const dataList = [
     visits: 212,
     progress: 23,
     status: "relationship",
-    subRows: [
+    children: [
       {
         firstName: "Chaya",
         lastName: "Berge",
@@ -3839,7 +3839,7 @@ const dataList = [
         visits: 521,
         progress: 38,
         status: "single",
-        subRows: [
+        children: [
           {
             firstName: "Araceli",
             lastName: "Legros",
@@ -3877,7 +3877,7 @@ const dataList = [
         visits: 852,
         progress: 38,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Jerald",
             lastName: "Botsford",
@@ -3915,7 +3915,7 @@ const dataList = [
         visits: 980,
         progress: 51,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Destiny",
             lastName: "Prohaska",
@@ -3953,7 +3953,7 @@ const dataList = [
         visits: 753,
         progress: 52,
         status: "complicated",
-        subRows: [
+        children: [
           {
             firstName: "Eunice",
             lastName: "Hodkiewicz",
@@ -3991,7 +3991,7 @@ const dataList = [
         visits: 565,
         progress: 5,
         status: "relationship",
-        subRows: [
+        children: [
           {
             firstName: "Anne",
             lastName: "Ryan",
@@ -4104,7 +4104,8 @@ function App() {
   });
   const table = slotBuilder({
     showTools: true,
-    selectModel: true,
+    selectModel: false,
+    subRowsKey:'children',
     expand: true,
     showSelectedInfo: true,
     rowKey: "id",

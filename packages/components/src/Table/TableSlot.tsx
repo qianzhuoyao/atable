@@ -93,22 +93,28 @@ const SELECT_KEY = "__selectionCheckBox__";
 
 const HeaderCheckBox = <T,>({
   table,
+  selectModel,
   expand,
+  customExpand,
 }: {
   table: Table<T>;
+  selectModel: boolean;
   expand?: boolean;
+  customExpand: ITableParams<T>["customExpand"];
 }) => {
   console.log("table.getIsAllRowsSelected()");
 
   return (
     <>
-      <IndeterminateCheckbox
-        {...{
-          checked: table.getIsAllRowsSelected(),
-          indeterminate: table.getIsSomeRowsSelected(),
-          onChange: table.getToggleAllRowsSelectedHandler(),
-        }}
-      />
+      {selectModel && (
+        <IndeterminateCheckbox
+          {...{
+            checked: table.getIsAllRowsSelected(),
+            indeterminate: table.getIsSomeRowsSelected(),
+            onChange: table.getToggleAllRowsSelectedHandler(),
+          }}
+        />
+      )}
       {expand ? (
         <div
           {...{
@@ -119,7 +125,13 @@ const HeaderCheckBox = <T,>({
           }}
         >
           {table.getIsAllRowsExpanded() ? (
-            <ArrowDownOutlined />
+            customExpand ? (
+              customExpand({ type: "isHead", collapsed: true })
+            ) : (
+              <ArrowDownOutlined />
+            )
+          ) : customExpand ? (
+            customExpand({ type: "isHead", collapsed: false })
           ) : (
             <ArrowRightOutlined />
           )}
@@ -415,6 +427,7 @@ export const TableSlot = <T,>({
     clickedRowKeyList,
     rowStyle,
     cellStyle,
+    customExpand,
     popupColHidden,
     colSortable,
     headerStyle,
@@ -458,34 +471,38 @@ export const TableSlot = <T,>({
   const checkData = useMemo(() => data || [], [data]);
 
   const columns = useMemo(() => {
-    if (ctxState.config.selectModel) {
-      if (
-        col &&
-        (col[0] as { accessorKey: string }).accessorKey !== SELECT_KEY
-      ) {
-        col.unshift({
-          id: SELECT_KEY,
-          accessorKey: SELECT_KEY,
-          size: DEFAULT_SELECT_WIDTH,
-          header: ({ table }) => (
-            <HeaderCheckBox<T>
-              table={table}
-              expand={ctxState.config.expand}
-            ></HeaderCheckBox>
-          ),
-          cell: ({ row }) => (
+    if (col && (col[0] as { accessorKey: string }).accessorKey !== SELECT_KEY) {
+      col.unshift({
+        id: SELECT_KEY,
+        accessorKey: SELECT_KEY,
+        size: DEFAULT_SELECT_WIDTH,
+        header: ({ table }) => (
+          <HeaderCheckBox<T>
+            selectModel={!!ctxState.config.selectModel}
+            customExpand={customExpand}
+            table={table}
+            expand={ctxState.config.expand}
+          ></HeaderCheckBox>
+        ),
+        cell: ({ row }) => (
+          <div
+            style={{
+              paddingLeft: `${
+                row.depth *
+                (typeof ctxState.config.depthSize === "number"
+                  ? ctxState.config.depthSize
+                  : 15)
+              }px`,
+            }}
+          >
             <div
               style={{
-                paddingLeft: `${row.depth * 15}px`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+              {ctxState.config.selectModel && (
                 <IndeterminateCheckbox
                   {...{
                     disabled: rowSelectDisable?.(row.original),
@@ -495,35 +512,42 @@ export const TableSlot = <T,>({
                     onChange: row.getToggleSelectedHandler(),
                   }}
                 />
+              )}
 
-                {ctxState.config.expand && row.getCanExpand() ? (
-                  <div
-                    {...{
-                      onClick: row.getToggleExpandedHandler(),
-                      style: { cursor: "pointer" },
-                    }}
-                  >
-                    {row.getIsExpanded() ? (
-                      <ArrowDownOutlined />
+              {ctxState.config.expand && row.getCanExpand() ? (
+                <div
+                  {...{
+                    onClick: row.getToggleExpandedHandler(),
+                    style: { cursor: "pointer" },
+                  }}
+                >
+                  {row.getIsExpanded() ? (
+                    customExpand ? (
+                      customExpand({ type: "isLeaf", collapsed: true })
                     ) : (
-                      <ArrowRightOutlined />
-                    )}
-                  </div>
-                ) : (
-                  <></>
-                )}
-              </div>
+                      <ArrowDownOutlined />
+                    )
+                  ) : customExpand ? (
+                    customExpand({ type: "isLeaf", collapsed: false })
+                  ) : (
+                    <ArrowRightOutlined />
+                  )}
+                </div>
+              ) : (
+                <></>
+              )}
             </div>
-          ),
-          footer: (props) => props.column.id,
-        });
-      }
+          </div>
+        ),
+        footer: (props) => props.column.id,
+      });
     }
     return col;
   }, [
     col,
     ctxState.config.expand,
     ctxState.config.selectModel,
+    customExpand,
     rowSelectDisable,
   ]);
 
@@ -996,7 +1020,7 @@ export const TableSlot = <T,>({
               style={{
                 position: "sticky",
                 top: 0,
-                zIndex: 99,
+                zIndex: 499,
                 color: "rgba(0, 0, 0, 0.85)",
                 background: "#fff",
                 fontSize: "14px",
