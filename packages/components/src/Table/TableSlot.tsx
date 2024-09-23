@@ -304,7 +304,7 @@ const DraggableTableHeader = <T,>({
         background: "rgba(245, 248, 253, 1)",
         display: "flex",
         alignItems: "center",
-        ...(header.column.id !== SELECT_KEY && headerStyle?.(header.column.id)),
+        ...headerStyle?.(header.column.id),
       }}
     >
       <div
@@ -545,6 +545,7 @@ export const TableSlot = <T,>({
     return col;
   }, [
     col,
+    ctxState.config.depthSize,
     ctxState.config.expand,
     ctxState.config.selectModel,
     customExpand,
