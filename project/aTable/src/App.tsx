@@ -4024,6 +4024,14 @@ const dataList = [
     ],
   },
 ];
+const renderSubComponent = ({ row }: { row: any }) => {
+  return (
+    <span style={{ fontSize: "10px" }}>
+      <code>{JSON.stringify(row.original, null, 2)}</code>
+    </span>
+  );
+};
+
 function App() {
   const columns = useMemo<ColumnDef<any, any>[]>(
     () => [
@@ -4090,7 +4098,7 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       scrollTo("001242387210441298");
-      console.log('rererererw')
+      console.log("rererererw");
     }, 2000);
   }, [scrollTo]);
 
@@ -4105,8 +4113,8 @@ function App() {
   const table = slotBuilder({
     showTools: true,
     selectModel: false,
-    subRowsKey:'children',
-    expand: true,
+    subRowsKey: "children",
+    expand: false,
     showSelectedInfo: true,
     rowKey: "id",
     footer: ["total"],
@@ -4114,7 +4122,7 @@ function App() {
   onSelectChange((e) => {
     console.log(e, "defgggggg");
   });
-  console.log(data,'csacascasa')
+  console.log(data, "csacascasa");
   return (
     <>
       {table({
@@ -4122,7 +4130,8 @@ function App() {
           height: "500px",
           width: "1000px",
         },
-
+        getRowCanExpand: () => false,
+        renderSubComponent,
         data,
         setData,
         selectedRowKeyList: () => {

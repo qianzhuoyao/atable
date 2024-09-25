@@ -1,5 +1,5 @@
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { CSSProperties, ReactNode } from "react";
 
 export const FOOTER = ["jump", "size", "total"] as const;
@@ -44,12 +44,13 @@ export interface IATableConfig {
   expand?: boolean;
   rowKey: string;
   subRowsKey?: string;
-  depthSize?:number;
+  depthSize?: number;
   showTools?: boolean;
   tools?: (typeof TOOLS)[number][];
   showSelectedInfo?: boolean;
   hideFooter?: boolean;
   footer?: (typeof FOOTER)[number][];
+ 
 }
 
 export interface ITableParams<T> {
@@ -68,6 +69,8 @@ export interface ITableParams<T> {
   colSortable?: (prop: string) => boolean;
   popupColHidden?: (prop: string) => boolean;
   rowSelectDisable?: (row: T) => boolean;
+  getRowCanExpand?: (row: Row<T>) => boolean;
+  renderSubComponent: (props: { row: Row<T> }) => React.ReactElement
   customExpand?: (params: {
     type: "isHead" | "isLeaf";
     collapsed: boolean;

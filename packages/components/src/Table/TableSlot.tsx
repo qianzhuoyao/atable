@@ -199,6 +199,7 @@ const DraggableTableHeader = <T,>({
   header,
   table,
   hasSyncPermission,
+  depthSize,
   headerStyle,
   columnResizeMode,
   onHeaderResizeStart,
@@ -209,6 +210,7 @@ const DraggableTableHeader = <T,>({
   expand,
   onHeaderResizeEnd,
 }: {
+  depthSize: unknown;
   colSortable?: (prop: string) => boolean;
   hasSyncPermission: number;
   header: Header<T, unknown>;
@@ -314,7 +316,9 @@ const DraggableTableHeader = <T,>({
           minWidth:
             header.column.id !== SELECT_KEY
               ? header.getSize()
-              : table.getExpandedDepth() * 15 + DEFAULT_SELECT_WIDTH,
+              : table.getExpandedDepth() *
+                  (typeof depthSize === "number" ? depthSize : 15) +
+                DEFAULT_SELECT_WIDTH,
           display: "flex",
           alignItems: "center",
           justifyContent:
@@ -422,6 +426,8 @@ export const TableSlot = <T,>({
     pageSize,
     total,
     setData,
+    getRowCanExpand,
+    renderSubComponent,
     selectedRowKeyList,
     rowSelectDisable,
     clickedRowKeyList,
@@ -471,76 +477,81 @@ export const TableSlot = <T,>({
   const checkData = useMemo(() => data || [], [data]);
 
   const columns = useMemo(() => {
-    if (col && (col[0] as { accessorKey: string }).accessorKey !== SELECT_KEY) {
-      col.unshift({
-        id: SELECT_KEY,
-        accessorKey: SELECT_KEY,
-        size: DEFAULT_SELECT_WIDTH,
-        header: ({ table }) => (
-          <HeaderCheckBox<T>
-            selectModel={!!ctxState.config.selectModel}
-            customExpand={customExpand}
-            table={table}
-            expand={ctxState.config.expand}
-          ></HeaderCheckBox>
-        ),
-        cell: ({ row }) => (
-          <div
-            style={{
-              paddingLeft: `${
-                row.depth *
-                (typeof ctxState.config.depthSize === "number"
-                  ? ctxState.config.depthSize
-                  : 15)
-              }px`,
-            }}
-          >
+    if (ctxState.config.selectModel || ctxState.config.expand) {
+      if (
+        col &&
+        (col[0] as { accessorKey: string }).accessorKey !== SELECT_KEY
+      ) {
+        col.unshift({
+          id: SELECT_KEY,
+          accessorKey: SELECT_KEY,
+          size: DEFAULT_SELECT_WIDTH,
+          header: ({ table }) => (
+            <HeaderCheckBox<T>
+              selectModel={!!ctxState.config.selectModel}
+              customExpand={customExpand}
+              table={table}
+              expand={ctxState.config.expand}
+            ></HeaderCheckBox>
+          ),
+          cell: ({ row }) => (
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                paddingLeft: `${
+                  row.depth *
+                  (typeof ctxState.config.depthSize === "number"
+                    ? ctxState.config.depthSize
+                    : 15)
+                }px`,
               }}
             >
-              {ctxState.config.selectModel && (
-                <IndeterminateCheckbox
-                  {...{
-                    disabled: rowSelectDisable?.(row.original),
-                    checked:
-                      row.getIsSelected() || row.getIsAllSubRowsSelected(),
-                    indeterminate: row.getIsSomeSelected(),
-                    onChange: row.getToggleSelectedHandler(),
-                  }}
-                />
-              )}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {ctxState.config.selectModel && (
+                  <IndeterminateCheckbox
+                    {...{
+                      disabled: rowSelectDisable?.(row.original),
+                      checked:
+                        row.getIsSelected() || row.getIsAllSubRowsSelected(),
+                      indeterminate: row.getIsSomeSelected(),
+                      onChange: row.getToggleSelectedHandler(),
+                    }}
+                  />
+                )}
 
-              {ctxState.config.expand && row.getCanExpand() ? (
-                <div
-                  {...{
-                    onClick: row.getToggleExpandedHandler(),
-                    style: { cursor: "pointer" },
-                  }}
-                >
-                  {row.getIsExpanded() ? (
-                    customExpand ? (
-                      customExpand({ type: "isLeaf", collapsed: true })
+                {ctxState.config.expand && row.getCanExpand() ? (
+                  <div
+                    {...{
+                      onClick: row.getToggleExpandedHandler(),
+                      style: { cursor: "pointer" },
+                    }}
+                  >
+                    {row.getIsExpanded() ? (
+                      customExpand ? (
+                        customExpand({ type: "isLeaf", collapsed: true })
+                      ) : (
+                        <ArrowDownOutlined />
+                      )
+                    ) : customExpand ? (
+                      customExpand({ type: "isLeaf", collapsed: false })
                     ) : (
-                      <ArrowDownOutlined />
-                    )
-                  ) : customExpand ? (
-                    customExpand({ type: "isLeaf", collapsed: false })
-                  ) : (
-                    <ArrowRightOutlined />
-                  )}
-                </div>
-              ) : (
-                <></>
-              )}
+                      <ArrowRightOutlined />
+                    )}
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
             </div>
-          </div>
-        ),
-        footer: (props) => props.column.id,
-      });
+          ),
+          footer: (props) => props.column.id,
+        });
+      }
     }
     return col;
   }, [
@@ -632,11 +643,15 @@ export const TableSlot = <T,>({
           lineHeight: "36px",
           color: "rgba(0, 0, 0, 0.85)",
           fontSize: "14px",
-          ...(cell.column.id !== SELECT_KEY &&
-            cellStyle?.(cell.column.id, cell.row.original)),
+          ...cellStyle?.(cell.column.id, cell.row.original),
         }}
       >
-        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        {cell.getIsAggregated()
+          ? flexRender(cell.column.columnDef.cell, cell.getContext())
+          : cell.getIsPlaceholder()
+          ? null // For cells with repeated values, render null
+          : // Otherwise, just render the regular cell
+            flexRender(cell.column.columnDef.cell, cell.getContext())}
       </div>
     );
   };
@@ -651,6 +666,7 @@ export const TableSlot = <T,>({
       columnSizing,
       expanded,
     },
+    getRowCanExpand,
     columnResizeMode,
     columnResizeDirection,
     getRowId: (row) => {
@@ -1056,6 +1072,7 @@ export const TableSlot = <T,>({
                         onHeaderResizeEnd={onHeaderResizeEnd}
                         columnResizeMode={columnResizeMode}
                         header={header}
+                        depthSize={ctxState.config.depthSize}
                       ></DraggableTableHeader>
                     ))}
                   </SortableContext>
@@ -1071,51 +1088,53 @@ export const TableSlot = <T,>({
             >
               {table.getRowModel().rows.map((row, index) => {
                 return (
-                  <div
-                    key={row.id + "-m-" + index}
-                    id={
-                      (row.original as Record<string, string>)[
-                        ctxState.config.rowKey || ""
-                      ]
-                    }
-                    className="a-syn-row"
-                    style={{
-                      display:
-                        filterModel === "selected" &&
-                        !(
-                          row.getIsAllSubRowsSelected() ||
-                          row.getIsSomeSelected() ||
-                          row.getIsSelected()
-                        )
-                          ? "none"
-                          : "flex",
-                      background: clickedRows.includes(
-                        (row.original as Record<string, unknown>)[
+                  <Fragment key={row.id + "-m-" + index}>
+                    <div
+                      id={
+                        (row.original as Record<string, string>)[
                           ctxState.config.rowKey || ""
                         ]
-                      )
-                        ? "rgba(54, 122, 228, 0.35)"
-                        : row.getIsSelected()
-                        ? "rgba(54, 122, 228, 0.15)"
-                        : "",
-                      ...rowStyle?.(row.original, row.index),
-                    }}
-                    onClick={() => onHandleClickRow(row.original)}
-                  >
-                    {row.getVisibleCells().map((cell, index) => (
-                      <SortableContext
-                        key={cell.id + "-s-" + index}
-                        items={columnOrder}
-                        strategy={horizontalListSortingStrategy}
-                      >
-                        <DragAlongCell<T>
-                          key={cell.id + "-d-" + index}
-                          cell={cell}
-                          expand={ctxState.config.expand}
-                        />
-                      </SortableContext>
-                    ))}
-                  </div>
+                      }
+                      className="a-syn-row"
+                      style={{
+                        display:
+                          filterModel === "selected" &&
+                          !(
+                            row.getIsAllSubRowsSelected() ||
+                            row.getIsSomeSelected() ||
+                            row.getIsSelected()
+                          )
+                            ? "none"
+                            : "flex",
+                        background: clickedRows.includes(
+                          (row.original as Record<string, unknown>)[
+                            ctxState.config.rowKey || ""
+                          ]
+                        )
+                          ? "rgba(54, 122, 228, 0.35)"
+                          : row.getIsSelected()
+                          ? "rgba(54, 122, 228, 0.15)"
+                          : "",
+                        ...rowStyle?.(row.original, row.index),
+                      }}
+                      onClick={() => onHandleClickRow(row.original)}
+                    >
+                      {row.getVisibleCells().map((cell, index) => (
+                        <SortableContext
+                          key={cell.id + "-s-" + index}
+                          items={columnOrder}
+                          strategy={horizontalListSortingStrategy}
+                        >
+                          <DragAlongCell<T>
+                            key={cell.id + "-d-" + index}
+                            cell={cell}
+                            expand={ctxState.config.expand}
+                          />
+                        </SortableContext>
+                      ))}
+                    </div>
+                    {row.getIsExpanded() && <>{renderSubComponent({ row })}</>}
+                  </Fragment>
                 );
               })}
             </div>
