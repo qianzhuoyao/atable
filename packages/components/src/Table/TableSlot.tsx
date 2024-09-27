@@ -1241,7 +1241,7 @@ export const TableSlot = <T,>({
 
         {ctxState.config.hideFooter ? (
           <></>
-        ) : customPagination ? (
+        ) : !customPagination ? (
           <>
             <div
               style={{
