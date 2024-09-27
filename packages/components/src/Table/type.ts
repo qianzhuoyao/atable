@@ -33,6 +33,7 @@ export interface IEffect<T> {
   onPageChange: (updateParams: { pageIndex: number; pageSize: number }) => void;
   onTableSync: (syncTableColInfo: IColInfo[]) => void;
   onRowClick: (row: T) => void;
+  onColVisibleChange: (colIdList: string[]) => void;
   onDescSort: (prop: string) => void;
   onAscSort: (prop: string) => void;
   //暂不做
@@ -50,7 +51,6 @@ export interface IATableConfig {
   showSelectedInfo?: boolean;
   hideFooter?: boolean;
   footer?: (typeof FOOTER)[number][];
- 
 }
 
 export interface ITableParams<T> {
@@ -61,6 +61,8 @@ export interface ITableParams<T> {
   pageSize: number;
   loading?: boolean;
   total: number;
+  //col显示隐藏
+  colVisibleColIdList?: (() => (string | undefined)[]) | (string | undefined)[];
   clickedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
   selectedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
@@ -70,7 +72,7 @@ export interface ITableParams<T> {
   popupColHidden?: (prop: string) => boolean;
   rowSelectDisable?: (row: T) => boolean;
   getRowCanExpand?: (row: Row<T>) => boolean;
-  renderSubComponent: (props: { row: Row<T> }) => React.ReactElement
+  renderSubComponent: (props: { row: Row<T> }) => React.ReactElement;
   customExpand?: (params: {
     type: "isHead" | "isLeaf";
     collapsed: boolean;

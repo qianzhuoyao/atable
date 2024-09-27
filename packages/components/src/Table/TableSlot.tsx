@@ -59,6 +59,8 @@ import {
   getExpandedRowModel,
   getFilteredRowModel,
   HeaderContext,
+  VisibilityState,
+  ColumnDef,
 } from "@tanstack/react-table";
 import { Loading } from "./loading.tsx";
 
@@ -403,6 +405,7 @@ export const TableSlot = <T,>({
   onAscSort,
   onDescSort,
   onTableSync,
+  onColVisibleChange,
   onRefreshCallback,
   onPageChange,
   onRowClick,
@@ -434,6 +437,7 @@ export const TableSlot = <T,>({
     rowStyle,
     cellStyle,
     customExpand,
+    colVisibleColIdList,
     popupColHidden,
     colSortable,
     headerStyle,
@@ -441,47 +445,45 @@ export const TableSlot = <T,>({
     style,
   } = tableState;
   const { state: ctxState } = useTableContext();
-  const [columnSizing, setColumnSizing] = useState({});
-  const [clickedRows, setClickedRows] = useState<unknown[]>(() => {
-    const tableClickedRowKeyList: unknown[] | undefined =
-      typeof clickedRowKeyList === "function"
-        ? clickedRowKeyList()
-        : clickedRowKeyList;
-
-    return tableClickedRowKeyList || [];
-  });
-  const [filterModel, setFilterModel] = useState<"none" | "selected">("none");
-  const [columnVisibility, setColumnVisibility] = useState({});
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>(() => {
-    console.log("d3wdfff");
-    const selectRowKeyList: unknown[] | undefined =
-      typeof selectedRowKeyList === "function"
-        ? selectedRowKeyList()
-        : selectedRowKeyList;
-
-    const key = ctxState.config?.rowKey;
-    if (!key) {
-      return {};
-    }
-    const selection: RowSelectionState = {};
-    selectRowKeyList?.map((rowKey) => {
-      if (ctxState.config.rowKey && typeof rowKey === "string") {
-        selection[rowKey] = true;
+  const setVisibleAct = useCallback(
+    (columns: ColumnDef<T>[]) => {
+      const visibleRowKeyList: unknown[] | undefined =
+        typeof colVisibleColIdList === "function"
+          ? colVisibleColIdList()
+          : colVisibleColIdList;
+      const list: VisibilityState = {};
+      if (visibleRowKeyList) {
+        columns.map((col) => {
+          console.log(col.id, visibleRowKeyList, "col.id");
+          if (col.id) {
+            if (visibleRowKeyList.includes(col.id) || col.id === SELECT_KEY) {
+              list[col.id] = true;
+            } else {
+              list[col.id] = false;
+            }
+          }
+        });
       }
-    });
+      console.log(visibleRowKeyList, columns, "visibleRowKeyList");
 
-    return selection;
-  });
-  const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
+      // visibleRowKeyList?.map((rowKey) => {
+      //   if (ctxState.config.rowKey && typeof rowKey === "string") {
+      //     list[rowKey] = true;
+      //   }
+      // });
+      console.log(list, "lists");
 
-  const checkData = useMemo(() => data || [], [data]);
-
-  const columns = useMemo(() => {
+      return list;
+    },
+    [colVisibleColIdList]
+  );
+  const getColumns = useCallback(() => {
     if (ctxState.config.selectModel || ctxState.config.expand) {
       if (
         col &&
         (col[0] as { accessorKey: string }).accessorKey !== SELECT_KEY
       ) {
+        //需要对显隐做控制
         col.unshift({
           id: SELECT_KEY,
           accessorKey: SELECT_KEY,
@@ -562,7 +564,79 @@ export const TableSlot = <T,>({
     customExpand,
     rowSelectDisable,
   ]);
+  const [columnSizing, setColumnSizing] = useState({});
+  const [clickedRows, setClickedRows] = useState<unknown[]>([]);
+  const [filterModel, setFilterModel] = useState<"none" | "selected">("none");
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => {
+      return setVisibleAct(getColumns());
+    }
+  );
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
 
+  const checkData = useMemo(() => data || [], [data]);
+
+  const setClickedAct = useCallback(() => {
+    const tableClickedRowKeyList: unknown[] | undefined =
+      typeof clickedRowKeyList === "function"
+        ? clickedRowKeyList()
+        : clickedRowKeyList;
+
+    return tableClickedRowKeyList || [];
+  }, [clickedRowKeyList]);
+
+  const setSelectionAct = useCallback(() => {
+    console.log("d3wdfff");
+    const selectRowKeyList: unknown[] | undefined =
+      typeof selectedRowKeyList === "function"
+        ? selectedRowKeyList()
+        : selectedRowKeyList;
+
+    const key = ctxState.config?.rowKey;
+    if (!key) {
+      return {};
+    }
+    const selection: RowSelectionState = {};
+    selectRowKeyList?.map((rowKey) => {
+      if (ctxState.config.rowKey && typeof rowKey === "string") {
+        selection[rowKey] = true;
+      }
+    });
+    return selection;
+  }, [ctxState.config.rowKey, selectedRowKeyList]);
+
+  const columns = useMemo(() => {
+    console.log('d23gfgg')
+    const col = getColumns();
+    setColumnVisibility(() => {
+      return setVisibleAct(col);
+    });
+    return col;
+  }, [getColumns, setVisibleAct]);
+
+  const actSelection = useMemo(() => {
+    console.log("dddd2ddddd232d2d2");
+    return setSelectionAct();
+  }, [setSelectionAct]);
+
+  useEffect(() => {
+  
+    console.log(actSelection, "dddd2d2d2d2");
+    setRowSelection(() => actSelection);
+  }, [actSelection]);
+
+  useEffect(() => {
+    console.log("请问地区问题");
+    setClickedAct();
+  }, [setClickedAct]);
+
+  useEffect(() => {
+    console.log("请问地区的弟弟问题");
+    setColumnVisibility(() => {
+      return setVisibleAct(columns);
+    });
+  }, [columns, setVisibleAct]);
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [columnResizeMode] = useState<ColumnResizeMode>("onChange");
   const [columnResizeDirection] = useState<ColumnResizeDirection>("ltr");
@@ -620,7 +694,6 @@ export const TableSlot = <T,>({
       width: cell.column.getSize(),
       zIndex: isDragging ? 149 : 0,
     };
-    console.log(cell, table.getExpandedDepth(), "cellcell");
     return (
       <div
         key={cell.id + "-dc-"}
@@ -702,7 +775,13 @@ export const TableSlot = <T,>({
     debugHeaders: false,
     debugColumns: false,
   });
-
+  useEffect(() => {
+    console.log(columnVisibility, "columnVisibility");
+    const showColList = table.getVisibleFlatColumns();
+    onColVisibleChange(
+      showColList.map((c) => c.id).filter((z) => ![SELECT_KEY].includes(z))
+    );
+  }, [columnVisibility, onColVisibleChange, table]);
   useEffect(() => {
     console.log(table.getSelectedRowModel(), "getSelectedRowModel");
     selectedRef.current.pageCache[pageIndex] = table
@@ -711,7 +790,7 @@ export const TableSlot = <T,>({
   }, [checkData, ctxState.config.rowKey, pageIndex, rowSelection, table]);
 
   useEffect(() => {
-    console.log(rowSelection, "table.getRowModel().rows");
+    console.log('onSelectChange33r')
     const result: T[] = [];
     Object.values(selectedRef.current.pageCache).map((pageItem) => {
       pageItem.map((item) => {
@@ -719,7 +798,7 @@ export const TableSlot = <T,>({
       });
     });
     onSelectChange?.(result);
-  }, [onSelectChange, rowSelection]);
+  }, [onSelectChange]);
 
   console.log(
     checkData,

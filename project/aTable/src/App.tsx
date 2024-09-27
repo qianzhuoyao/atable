@@ -1,4 +1,4 @@
-import { useATable, ColumnDef } from "@ATable/components";
+import { useATable, useMergeCol, ColumnDef } from "@ATable/components";
 import "./App.css";
 import { makeData, Person } from "./makeData";
 import { HTMLProps, useEffect, useMemo, useRef, useState } from "react";
@@ -4077,12 +4077,14 @@ function App() {
 
   const [data, setData] = useState(() => dataList);
   const [pageIndex, setPageIndex] = useState(1);
+   useMergeCol([], []);
   const [pageSize, setPageSize] = useState(20);
   const {
     slotBuilder,
     onSelectChange,
     onRefreshCallback,
     scrollTo,
+    onColVisibleChange,
     onAscSort,
     onDescSort,
     onPageChange,
@@ -4091,16 +4093,25 @@ function App() {
   onRefreshCallback(() => {
     console.log("reweeeeee");
   });
+ 
   onAscSort(() => {
     console.log("asdasdasdasd");
   });
 
-  useEffect(() => {
-    setTimeout(() => {
-      scrollTo("001242387210441298");
-      console.log("rererererw");
-    }, 2000);
-  }, [scrollTo]);
+  // useEffect(()=>{
+  //   setTimeout(() => {
+  //     setData(d=>d.slice(0,10))
+
+  //   }, 3000);
+  // },[])
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //    // setData(d=>d.slice(0,10))
+  //     scrollTo("001242387210441298");
+  //     console.log("rererererw");
+  //   }, 2000);
+  // }, [scrollTo]);
 
   onDescSort(() => {
     console.log("asdasdasdonDescSortasd");
@@ -4114,7 +4125,7 @@ function App() {
     showTools: true,
     selectModel: false,
     subRowsKey: "children",
-    expand: false,
+    expand: true,
     showSelectedInfo: true,
     rowKey: "id",
     footer: ["total"],
@@ -4130,10 +4141,11 @@ function App() {
           height: "500px",
           width: "1000px",
         },
-        getRowCanExpand: () => false,
+        getRowCanExpand: () => true,
         renderSubComponent,
         data,
         setData,
+        //colVisibleColIdList:['age'],
         selectedRowKeyList: () => {
           return data.map((i) => {
             if (i.age > 10) {

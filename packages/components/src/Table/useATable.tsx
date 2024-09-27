@@ -39,6 +39,10 @@ export const useATable = <T,>(tag?: string) => {
     console.log("cweccewcecec");
     effectRef.current.m.onAscSort?.(prop);
   }, []);
+
+  const onTableColVisibleChange = useCallback((colIdList: string[]) => {
+    effectRef.current.m.onColVisibleChange?.(colIdList);
+  }, []);
   const onTableDescSort = useCallback((prop: string) => {
     effectRef.current.m.onDescSort?.(prop);
   }, []);
@@ -76,6 +80,7 @@ export const useATable = <T,>(tag?: string) => {
               onTableSync={onTableColInfoChange}
               onAscSort={onTableAscSort}
               onDescSort={onTableDescSort}
+              onColVisibleChange={onTableColVisibleChange}
               customPagination={effectRef.current.p()}
             />
           ) : (
@@ -92,6 +97,7 @@ export const useATable = <T,>(tag?: string) => {
       onRowSelectionChange,
       onTableAscSort,
       onTableColInfoChange,
+      onTableColVisibleChange,
       onTableDescSort,
       onTablePageChange,
       onTableRefreshCallback,
@@ -161,8 +167,15 @@ export const useATable = <T,>(tag?: string) => {
   const onAscSort = useCallback((cb: IEffect<T>["onAscSort"]) => {
     effectRef.current.m.onAscSort = cb;
   }, []);
+
+  const onColVisibleChange = useCallback(
+    (cb: IEffect<T>["onColVisibleChange"]) => {
+      effectRef.current.m.onColVisibleChange = cb;
+    },
+    []
+  );
   const scrollTo = (rowKey: string) => {
-    document.getElementById(rowKey)?.scrollIntoView({behavior: "smooth"});
+    document.getElementById(rowKey)?.scrollIntoView({ behavior: "smooth" });
   };
   const setPagination = useCallback((customPagination: ReactNode) => {
     effectRef.current.p = () => customPagination;
@@ -178,6 +191,7 @@ export const useATable = <T,>(tag?: string) => {
     onHeaderMoveStart,
     onRowClick,
     onDescSort,
+    onColVisibleChange,
     onAscSort,
     onHeaderResizeEnd,
     onHeaderMoveEnd,

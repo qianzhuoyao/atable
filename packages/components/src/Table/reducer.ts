@@ -24,7 +24,7 @@ interface ITableContext {
 }
 
 export const initialTableState: ITableInitState = {
-  config: {},
+  config: { rowKey: "id" },
   tag: void 0,
 };
 
