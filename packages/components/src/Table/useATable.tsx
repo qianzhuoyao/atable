@@ -1,4 +1,4 @@
-import { ReactNode, useCallback, useReducer, useRef } from "react";
+import { ReactNode, useCallback, useMemo, useReducer, useRef } from "react";
 import { IATableConfig, IColInfo, IEffect, ITableParams } from "./type.ts";
 import { initialTableState, TableContext, TableReducer } from "./reducer.ts";
 import { TableSlot } from "./TableSlot.tsx";
@@ -181,22 +181,41 @@ export const useATable = <T,>(tag?: string) => {
     effectRef.current.p = () => customPagination;
   }, []);
 
-  return {
-    slotBuilder,
-    setUpdate,
-    setPagination,
-    scrollTo,
-    onHeaderResizeStart,
-    onRefreshCallback,
-    onHeaderMoveStart,
-    onRowClick,
-    onDescSort,
-    onColVisibleChange,
-    onAscSort,
-    onHeaderResizeEnd,
-    onHeaderMoveEnd,
-    onSelectChange,
-    onPageChange,
-    onTableSync,
-  };
+  return useMemo(
+    () => ({
+      slotBuilder,
+      setUpdate,
+      setPagination,
+      scrollTo,
+      onHeaderResizeStart,
+      onRefreshCallback,
+      onHeaderMoveStart,
+      onRowClick,
+      onDescSort,
+      onColVisibleChange,
+      onAscSort,
+      onHeaderResizeEnd,
+      onHeaderMoveEnd,
+      onSelectChange,
+      onPageChange,
+      onTableSync,
+    }),
+    [
+      onAscSort,
+      onColVisibleChange,
+      onDescSort,
+      onHeaderMoveEnd,
+      onHeaderMoveStart,
+      onHeaderResizeEnd,
+      onHeaderResizeStart,
+      onPageChange,
+      onRefreshCallback,
+      onRowClick,
+      onSelectChange,
+      onTableSync,
+      setPagination,
+      setUpdate,
+      slotBuilder,
+    ]
+  );
 };

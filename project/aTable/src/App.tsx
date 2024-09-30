@@ -4074,11 +4074,12 @@ function App() {
     ],
     []
   );
-const [s,setS] = useState(["07485256009603607"])
+  const [z, setZ] = useState([]);
+  const [s, setS] = useState([]);
   const [data, setData] = useState(() => dataList);
   const [pageIndex, setPageIndex] = useState(1);
-   useMergeCol([], []);
-  const [pageSize, setPageSize] = useState(10);
+  useMergeCol([], []);
+  const [pageSize, setPageSize] = useState(20);
   const {
     slotBuilder,
     onSelectChange,
@@ -4093,7 +4094,7 @@ const [s,setS] = useState(["07485256009603607"])
   onRefreshCallback(() => {
     console.log("reweeeeee");
   });
- 
+
   onAscSort(() => {
     console.log("asdasdasdasd");
   });
@@ -4124,12 +4125,18 @@ const [s,setS] = useState(["07485256009603607"])
     expand: true,
     showSelectedInfo: true,
     rowKey: "id",
-
   });
   onSelectChange((e) => {
     console.log(e, "defgggggg");
-    setS(e.map(f=>f.id))
+    setZ(1)
+    // setS(e.map((f) => f.id));
   });
+
+  useEffect(() => {
+    setTimeout(() => {
+      setS(["07485256009603607"]);
+    }, 2000);
+  }, []);
   console.log(data, "csacascasa");
   return (
     <>
@@ -4141,9 +4148,9 @@ const [s,setS] = useState(["07485256009603607"])
         getRowCanExpand: () => true,
         renderSubComponent,
         data,
-        collapse:true,
+        collapse: true,
         //colVisibleColIdList:['age'],
-        selectedRowKeyList:s,
+        selectedRowKeyList: s,
         colSortable: () => true,
         headerStyle: () => ({
           paddingLeft: "20px",
@@ -4154,7 +4161,6 @@ const [s,setS] = useState(["07485256009603607"])
         col: columns,
         pageSize,
         pageIndex,
-       
       })}
     </>
   );

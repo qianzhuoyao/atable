@@ -617,13 +617,13 @@ export const TableSlot = <T,>({
     });
     return selection;
   }, [ctxState.config.rowKey, selectedRowKeyList]);
-  const actSelection = useMemo(() => {
-    console.log("dddd2ddddd232d2d2");
-    return setSelectionAct();
+
+  const [rowSelection, setRowSelection] =
+    useState<RowSelectionState>(setSelectionAct);
+
+  useEffect(() => {
+    setRowSelection(setSelectionAct);
   }, [setSelectionAct]);
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>(
-    () => actSelection
-  );
   const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
 
   const checkData = useMemo(() => data || [], [data]);
