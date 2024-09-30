@@ -1,5 +1,11 @@
 import { ReactNode, useCallback, useMemo, useReducer, useRef } from "react";
-import { IATableConfig, IColInfo, IEffect, ITableParams } from "./type.ts";
+import {
+  IATableConfig,
+  IColInfo,
+  IEffect,
+  IHandleSelect,
+  ITableParams,
+} from "./type.ts";
 import { initialTableState, TableContext, TableReducer } from "./reducer.ts";
 import { TableSlot } from "./TableSlot.tsx";
 import { UniqueIdentifier } from "@dnd-kit/core";
@@ -46,6 +52,9 @@ export const useATable = <T,>(tag?: string) => {
   const onTableDescSort = useCallback((prop: string) => {
     effectRef.current.m.onDescSort?.(prop);
   }, []);
+  const onHandleTableSelect = useCallback((params: IHandleSelect<T>) => {
+    effectRef.current.m.onHandleSelect?.(params);
+  }, []);
   const onTablePageChange = useCallback(
     (pageInfo: { pageSize: number; pageIndex: number }) => {
       effectRef.current.m.onPageChange?.(pageInfo);
@@ -77,6 +86,7 @@ export const useATable = <T,>(tag?: string) => {
               onRefreshCallback={onTableRefreshCallback}
               onRowClick={onTableRowClick}
               onPageChange={onTablePageChange}
+              onHandleSelect={onHandleTableSelect}
               onTableSync={onTableColInfoChange}
               onAscSort={onTableAscSort}
               onDescSort={onTableDescSort}
@@ -94,6 +104,7 @@ export const useATable = <T,>(tag?: string) => {
       onColHeaderMoveStart,
       onColHeaderResizeEnd,
       onColHeaderResizeStart,
+      onHandleTableSelect,
       onRowSelectionChange,
       onTableAscSort,
       onTableColInfoChange,
@@ -164,10 +175,12 @@ export const useATable = <T,>(tag?: string) => {
   const onDescSort = useCallback((cb: IEffect<T>["onDescSort"]) => {
     effectRef.current.m.onDescSort = cb;
   }, []);
+  const onHandleSelect = useCallback((cb: IEffect<T>["onHandleSelect"]) => {
+    effectRef.current.m.onHandleSelect = cb;
+  }, []);
   const onAscSort = useCallback((cb: IEffect<T>["onAscSort"]) => {
     effectRef.current.m.onAscSort = cb;
   }, []);
-
   const onColVisibleChange = useCallback(
     (cb: IEffect<T>["onColVisibleChange"]) => {
       effectRef.current.m.onColVisibleChange = cb;
@@ -197,6 +210,7 @@ export const useATable = <T,>(tag?: string) => {
       onHeaderResizeEnd,
       onHeaderMoveEnd,
       onSelectChange,
+      onHandleSelect,
       onPageChange,
       onTableSync,
     }),
@@ -210,6 +224,7 @@ export const useATable = <T,>(tag?: string) => {
       onHeaderResizeStart,
       onPageChange,
       onRefreshCallback,
+      onHandleSelect,
       onRowClick,
       onSelectChange,
       onTableSync,

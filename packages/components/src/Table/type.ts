@@ -22,6 +22,11 @@ export interface IColInfo {
   moduleKey?: string;
   visible: boolean;
 }
+export interface IHandleSelect<T> {
+  status: boolean;
+  records: T[];
+  current?: T;
+}
 
 export interface IEffect<T> {
   onRefreshCallback: () => void;
@@ -32,6 +37,7 @@ export interface IEffect<T> {
   onHeaderMoveEnd: (prop: UniqueIdentifier) => void;
   onPageChange: (updateParams: { pageIndex: number; pageSize: number }) => void;
   onTableSync: (syncTableColInfo: IColInfo[]) => void;
+  onHandleSelect: (params: IHandleSelect<T>) => void;
   onRowClick: (row: T) => void;
   onColVisibleChange: (colIdList: string[]) => void;
   onDescSort: (prop: string) => void;

@@ -137,12 +137,14 @@ const SELECT_KEY = "__selectionCheckBox__";
 const HeaderCheckBox = <T,>({
   table,
   selectModel,
+  onHandleSelect,
   expand,
   customExpand,
 }: {
   table: Table<T>;
   selectModel: boolean;
   expand?: boolean;
+  onHandleSelect: IEffect<T>["onHandleSelect"];
   customExpand: ITableParams<T>["customExpand"];
 }) => {
   console.log("table.getIsAllRowsSelected()");
@@ -460,6 +462,7 @@ export const TableSlot = <T,>({
   onHeaderResizeEnd,
   onHeaderResizeStart,
   onAscSort,
+  onHandleSelect,
   onDescSort,
   onTableSync,
   onColVisibleChange,
@@ -544,6 +547,7 @@ export const TableSlot = <T,>({
               selectModel={!!ctxState.config.selectModel}
               customExpand={customExpand}
               table={table}
+              onHandleSelect={onHandleSelect}
               expand={ctxState.config.expand}
             ></HeaderCheckBox>
           ),
