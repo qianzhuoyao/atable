@@ -61,6 +61,8 @@ import {
   HeaderContext,
   VisibilityState,
   ColumnDef,
+  getPaginationRowModel,
+  PaginationState,
 } from "@tanstack/react-table";
 import { Loading } from "./loading.tsx";
 
@@ -147,8 +149,12 @@ const HeaderCheckBox = <T,>({
 
 const ColVisibleContent = <T,>({
   table,
+  tag,
+  onTableSync,
   popupColHidden,
 }: {
+  tag?: string;
+  onTableSync: IEffect<T>["onTableSync"];
   table: Table<T>;
   popupColHidden?: (prop: string) => boolean;
 }) => {
@@ -177,7 +183,19 @@ const ColVisibleContent = <T,>({
                 {...{
                   type: "checkbox",
                   checked: column.getIsVisible(),
-                  onChange: column.getToggleVisibilityHandler(),
+                  onChange: (e) => {
+                    column.getToggleVisibilityHandler()(e);
+                    onTableSync?.(
+                      table.getAllColumns().map((col) => {
+                        return {
+                          field: col.id,
+                          moduleKey: tag,
+                          visible: col.getIsVisible(),
+                          flex: col.getSize(),
+                        };
+                      })
+                    );
+                  },
                 }}
               />
               {typeof column.columnDef.header === "function"
@@ -413,28 +431,21 @@ export const TableSlot = <T,>({
   customPagination?: ReactNode | null;
   tableState: ITableParams<T>;
 } & Omit<IEffect<T>, "setUpdate">) => {
-  const selectedRef = useRef<{
-    //跨业选中
-    pageCache: Record<string, T[]>;
-    //跨业所有数据
-    pageList: Record<string, T[]>;
-  }>({
-    pageCache: {},
-    pageList: {},
-  });
   const {
     col,
     data,
     pageIndex,
     pageSize,
     total,
-    setData,
     getRowCanExpand,
     renderSubComponent,
     selectedRowKeyList,
     rowSelectDisable,
     clickedRowKeyList,
     rowStyle,
+    rowClickedBackground,
+    rowSelectedBackground,
+    rowClassName,
     cellStyle,
     customExpand,
     colVisibleColIdList,
@@ -564,19 +575,10 @@ export const TableSlot = <T,>({
     customExpand,
     rowSelectDisable,
   ]);
-  const [columnSizing, setColumnSizing] = useState({});
-  const [clickedRows, setClickedRows] = useState<unknown[]>([]);
-  const [filterModel, setFilterModel] = useState<"none" | "selected">("none");
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    () => {
-      return setVisibleAct(getColumns());
-    }
-  );
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
-
-  const checkData = useMemo(() => data || [], [data]);
-
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: pageIndex - 1 <= 0 ? 0 : pageIndex - 1,
+    pageSize,
+  });
   const setClickedAct = useCallback(() => {
     const tableClickedRowKeyList: unknown[] | undefined =
       typeof clickedRowKeyList === "function"
@@ -585,7 +587,16 @@ export const TableSlot = <T,>({
 
     return tableClickedRowKeyList || [];
   }, [clickedRowKeyList]);
-
+  const [columnSizing, setColumnSizing] = useState({});
+  const [clickedRows, setClickedRows] = useState<unknown[]>(() =>
+    setClickedAct()
+  );
+  const [filterModel, setFilterModel] = useState<"none" | "selected">("none");
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    () => {
+      return setVisibleAct(getColumns());
+    }
+  );
   const setSelectionAct = useCallback(() => {
     console.log("d3wdfff");
     const selectRowKeyList: unknown[] | undefined =
@@ -605,31 +616,26 @@ export const TableSlot = <T,>({
     });
     return selection;
   }, [ctxState.config.rowKey, selectedRowKeyList]);
+  const actSelection = useMemo(() => {
+    console.log("dddd2ddddd232d2d2");
+    return setSelectionAct();
+  }, [setSelectionAct]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>(
+    () => actSelection
+  );
+  const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
+
+  const checkData = useMemo(() => data || [], [data]);
+  console.log(checkData, "checkData");
 
   const columns = useMemo(() => {
-    console.log('d23gfgg')
+    console.log("d23gfgg");
     const col = getColumns();
     setColumnVisibility(() => {
       return setVisibleAct(col);
     });
     return col;
   }, [getColumns, setVisibleAct]);
-
-  const actSelection = useMemo(() => {
-    console.log("dddd2ddddd232d2d2");
-    return setSelectionAct();
-  }, [setSelectionAct]);
-
-  useEffect(() => {
-  
-    console.log(actSelection, "dddd2d2d2d2");
-    setRowSelection(() => actSelection);
-  }, [actSelection]);
-
-  useEffect(() => {
-    console.log("请问地区问题");
-    setClickedAct();
-  }, [setClickedAct]);
 
   useEffect(() => {
     console.log("请问地区的弟弟问题");
@@ -643,33 +649,6 @@ export const TableSlot = <T,>({
   const [columnOrder, setColumnOrder] = useState<string[]>(() =>
     columns.map((c) => c.id || "")
   );
-
-  useEffect(() => {
-    //数据数量不对则放弃
-    if (checkData?.length <= pageSize) {
-      selectedRef.current.pageList[String(pageIndex)] = checkData;
-    }
-  }, [checkData, pageIndex, pageSize]);
-
-  useEffect(() => {
-    setData(() => {
-      console.log(
-        filterModel,
-        pageIndex,
-        selectedRef.current.pageList,
-        selectedRef.current.pageList[String(pageIndex)],
-        "pageListpageIndexss"
-      );
-      if (filterModel === "selected") {
-        return Object.values(selectedRef.current.pageList).reduce(
-          (a, b) => a.concat(b),
-          []
-        );
-      } else {
-        return selectedRef.current.pageList[String(pageIndex)];
-      }
-    });
-  }, [filterModel, pageIndex, setData]);
 
   useEffect(() => {
     console.log(columns, "columnssss");
@@ -738,6 +717,7 @@ export const TableSlot = <T,>({
       columnOrder,
       columnSizing,
       expanded,
+      pagination,
     },
     getRowCanExpand,
     columnResizeMode,
@@ -764,6 +744,8 @@ export const TableSlot = <T,>({
         console.error(e);
       }
     },
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     onColumnSizingChange: setColumnSizing,
     onColumnOrderChange: setColumnOrder,
     onColumnVisibilityChange: setColumnVisibility,
@@ -776,29 +758,24 @@ export const TableSlot = <T,>({
     debugColumns: false,
   });
   useEffect(() => {
+    onSelectChange(table.getSelectedRowModel().rows.map((r) => r.original));
+  }, [onSelectChange, rowSelection, table]);
+  useEffect(() => {
     console.log(columnVisibility, "columnVisibility");
     const showColList = table.getVisibleFlatColumns();
     onColVisibleChange(
       showColList.map((c) => c.id).filter((z) => ![SELECT_KEY].includes(z))
     );
   }, [columnVisibility, onColVisibleChange, table]);
-  useEffect(() => {
-    console.log(table.getSelectedRowModel(), "getSelectedRowModel");
-    selectedRef.current.pageCache[pageIndex] = table
-      .getSelectedRowModel()
-      .flatRows.map((f) => f.original);
-  }, [checkData, ctxState.config.rowKey, pageIndex, rowSelection, table]);
 
   useEffect(() => {
-    console.log('onSelectChange33r')
-    const result: T[] = [];
-    Object.values(selectedRef.current.pageCache).map((pageItem) => {
-      pageItem.map((item) => {
-        result.push(item);
-      });
-    });
-    onSelectChange?.(result);
-  }, [onSelectChange]);
+    onPageChange({ ...pagination, pageIndex: pagination.pageIndex + 1 });
+  }, [onPageChange, pagination]);
+
+  useEffect(() => {
+    table.setPageIndex(pageIndex - 1 <= 0 ? 0 : pageIndex - 1);
+    table.setPageSize(pageSize);
+  }, [pageIndex, pageSize, table]);
 
   console.log(
     checkData,
@@ -868,9 +845,6 @@ export const TableSlot = <T,>({
   );
   const onHandleQuitFilter = useCallback(() => {
     setFilterModel("none");
-    // setData(() => selectedRef.current.pre);
-    // setExpanded(() => selectedRef.current.preExpanded);
-    // setRowSelection(() => selectedRef.current.preRowSelection);
   }, []);
   const onHandleClearSelection = useCallback(() => {
     setRowSelection({});
@@ -896,6 +870,7 @@ export const TableSlot = <T,>({
     },
     [ctxState.config.rowKey, onRowClick]
   );
+
   const onFilterSelectionRows = useCallback(() => {
     if (filterModel === "none") {
       setFilterModel("selected");
@@ -922,7 +897,8 @@ export const TableSlot = <T,>({
     );
   }
 
-  console.log(table.getRowModel(), checkData, "csew3fggf");
+  console.log(table.getRowModel(), checkData, pagination, "csew3fggf");
+
   return (
     <DndContext
       collisionDetection={closestCenter}
@@ -1047,6 +1023,8 @@ export const TableSlot = <T,>({
                         placement="bottom"
                         content={
                           <ColVisibleContent
+                            tag={ctxState.tag}
+                            onTableSync={onTableSync}
                             popupColHidden={popupColHidden}
                             table={table}
                           />
@@ -1165,57 +1143,101 @@ export const TableSlot = <T,>({
                 width: "100%",
               }}
             >
-              {table.getRowModel().rows.map((row, index) => {
-                return (
-                  <Fragment key={row.id + "-m-" + index}>
-                    <div
-                      id={
-                        (row.original as Record<string, string>)[
-                          ctxState.config.rowKey || ""
-                        ]
-                      }
-                      className="a-syn-row"
-                      style={{
-                        display:
-                          filterModel === "selected" &&
-                          !(
-                            row.getIsAllSubRowsSelected() ||
-                            row.getIsSomeSelected() ||
-                            row.getIsSelected()
-                          )
-                            ? "none"
-                            : "flex",
-                        background: clickedRows.includes(
-                          (row.original as Record<string, unknown>)[
-                            ctxState.config.rowKey || ""
-                          ]
-                        )
-                          ? "rgba(54, 122, 228, 0.35)"
-                          : row.getIsSelected()
-                          ? "rgba(54, 122, 228, 0.15)"
-                          : "",
-                        ...rowStyle?.(row.original, row.index),
-                      }}
-                      onClick={() => onHandleClickRow(row.original)}
-                    >
-                      {row.getVisibleCells().map((cell, index) => (
-                        <SortableContext
-                          key={cell.id + "-s-" + index}
-                          items={columnOrder}
-                          strategy={horizontalListSortingStrategy}
+              {filterModel === "selected"
+                ? table.getSelectedRowModel().rows.map((row, index) => {
+                    return (
+                      <Fragment key={row.id + "-ms-" + index}>
+                        <div
+                          id={
+                            (row.original as Record<string, string>)[
+                              ctxState.config.rowKey || ""
+                            ]
+                          }
+                          className={`a-syn-row ${rowClassName}`}
+                          style={{
+                            display: "flex",
+                            background: clickedRows.includes(
+                              (row.original as Record<string, unknown>)[
+                                ctxState.config.rowKey || ""
+                              ]
+                            )
+                              ? rowClickedBackground ||
+                                "rgba(54, 122, 228, 0.35)"
+                              : row.getIsSelected()
+                              ? rowSelectedBackground ||
+                                "rgba(54, 122, 228, 0.15)"
+                              : "",
+                            ...rowStyle?.(row.original, row.index),
+                          }}
+                          onClick={() => onHandleClickRow(row.original)}
                         >
-                          <DragAlongCell<T>
-                            key={cell.id + "-d-" + index}
-                            cell={cell}
-                            expand={ctxState.config.expand}
-                          />
-                        </SortableContext>
-                      ))}
-                    </div>
-                    {row.getIsExpanded() && <>{renderSubComponent({ row })}</>}
-                  </Fragment>
-                );
-              })}
+                          {row.getVisibleCells().map((cell, index) => (
+                            <SortableContext
+                              key={cell.id + "-s-" + index}
+                              items={columnOrder}
+                              strategy={horizontalListSortingStrategy}
+                            >
+                              <DragAlongCell<T>
+                                key={cell.id + "-d-" + index}
+                                cell={cell}
+                                expand={ctxState.config.expand}
+                              />
+                            </SortableContext>
+                          ))}
+                        </div>
+                        {row.getIsExpanded() && (
+                          <>{renderSubComponent({ row })}</>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                : table.getRowModel().rows.map((row, index) => {
+                    return (
+                      <Fragment key={row.id + "-m-" + index}>
+                        <div
+                          id={
+                            (row.original as Record<string, string>)[
+                              ctxState.config.rowKey || ""
+                            ]
+                          }
+                          className={`a-syn-row ${rowClassName}`}
+                          style={{
+                            display: "flex",
+                            background: clickedRows.includes(
+                              (row.original as Record<string, unknown>)[
+                                ctxState.config.rowKey || ""
+                              ]
+                            )
+                              ? rowClickedBackground ||
+                                "rgba(54, 122, 228, 0.35)"
+                              : row.getIsSelected()
+                              ? rowSelectedBackground ||
+                                "rgba(54, 122, 228, 0.15)"
+                              : "",
+                            ...rowStyle?.(row.original, row.index),
+                          }}
+                          onClick={() => onHandleClickRow(row.original)}
+                        >
+                          {row.getVisibleCells().map((cell, index) => (
+                            <SortableContext
+                              key={cell.id + "-s-" + index}
+                              items={columnOrder}
+                              strategy={horizontalListSortingStrategy}
+                            >
+                              <DragAlongCell<T>
+                                key={cell.id + "-d-" + index}
+                                cell={cell}
+                                expand={ctxState.config.expand}
+                              />
+                            </SortableContext>
+                          ))}
+                        </div>
+                        {row.getIsExpanded() && (
+                          <>{renderSubComponent({ row })}</>
+                        )}
+                      </Fragment>
+                    );
+                  })}
             </div>
           </div>
         ) : (
@@ -1261,7 +1283,7 @@ export const TableSlot = <T,>({
                     <span>总计</span>
                     <span>
                       {filterModel === "none"
-                        ? total
+                        ? total || Number(table.getRowCount().toLocaleString())
                         : Object.keys(rowSelection).length}
                     </span>
                   </>
@@ -1271,7 +1293,7 @@ export const TableSlot = <T,>({
               </div>
               <Pagination
                 size="small"
-                total={total}
+                total={total || Number(table.getRowCount().toLocaleString())}
                 showSizeChanger={
                   ctxState.config.footer?.includes("size") ||
                   !ctxState.config.footer
@@ -1280,14 +1302,12 @@ export const TableSlot = <T,>({
                   ctxState.config.footer?.includes("jump") ||
                   !ctxState.config.footer
                 }
-                current={pageIndex}
-                pageSize={pageSize}
-                onChange={(pageIndex, pageSize) =>
-                  onPageChange({
-                    pageIndex,
-                    pageSize,
-                  })
-                }
+                current={table.getState().pagination.pageIndex + 1}
+                pageSize={table.getState().pagination.pageSize}
+                onChange={(pageIndex, pageSize) => {
+                  table.setPageIndex(pageIndex - 1);
+                  table.setPageSize(pageSize);
+                }}
               />
             </div>
           </>

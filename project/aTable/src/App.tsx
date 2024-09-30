@@ -4074,11 +4074,11 @@ function App() {
     ],
     []
   );
-
+const [s,setS] = useState(["07485256009603607"])
   const [data, setData] = useState(() => dataList);
   const [pageIndex, setPageIndex] = useState(1);
    useMergeCol([], []);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
   const {
     slotBuilder,
     onSelectChange,
@@ -4116,22 +4116,19 @@ function App() {
   onDescSort(() => {
     console.log("asdasdasdonDescSortasd");
   });
-  onPageChange(({ pageIndex, pageSize }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    setData(dataList[pageIndex - 1]);
-  });
+
   const table = slotBuilder({
     showTools: true,
-    selectModel: false,
+    selectModel: true,
     subRowsKey: "children",
     expand: true,
     showSelectedInfo: true,
     rowKey: "id",
-    footer: ["total"],
+
   });
   onSelectChange((e) => {
     console.log(e, "defgggggg");
+    setS(e.map(f=>f.id))
   });
   console.log(data, "csacascasa");
   return (
@@ -4146,13 +4143,7 @@ function App() {
         data,
         setData,
         //colVisibleColIdList:['age'],
-        selectedRowKeyList: () => {
-          return data.map((i) => {
-            if (i.age > 10) {
-              return i.id;
-            }
-          });
-        },
+        selectedRowKeyList:s,
         colSortable: () => true,
         headerStyle: () => ({
           paddingLeft: "20px",
@@ -4163,7 +4154,7 @@ function App() {
         col: columns,
         pageSize,
         pageIndex,
-        total: 50,
+       
       })}
     </>
   );
