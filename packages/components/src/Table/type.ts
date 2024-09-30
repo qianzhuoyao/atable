@@ -67,6 +67,7 @@ export interface ITableParams<T> {
   selectedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
   headerStyle?: (prop: string) => CSSProperties;
+  collapse?: boolean;
   rowClickedBackground?: string;
   rowSelectedBackground?: string;
   rowStyle?: (row: T, index: number) => CSSProperties;

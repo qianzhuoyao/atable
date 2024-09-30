@@ -4142,6 +4142,7 @@ const [s,setS] = useState(["07485256009603607"])
         renderSubComponent,
         data,
         setData,
+        collapse:true,
         //colVisibleColIdList:['age'],
         selectedRowKeyList:s,
         colSortable: () => true,

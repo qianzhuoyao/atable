@@ -447,6 +447,7 @@ export const TableSlot = <T,>({
     rowSelectedBackground,
     rowClassName,
     cellStyle,
+    collapse,
     customExpand,
     colVisibleColIdList,
     popupColHidden,
@@ -636,7 +637,15 @@ export const TableSlot = <T,>({
     });
     return col;
   }, [getColumns, setVisibleAct]);
-
+  useEffect(() => {
+    if (collapse !== void 0) {
+      if (collapse) {
+        setExpanded(true);
+      } else {
+        setExpanded({});
+      }
+    }
+  }, [collapse]);
   useEffect(() => {
     console.log("请问地区的弟弟问题");
     setColumnVisibility(() => {
