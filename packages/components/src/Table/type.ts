@@ -55,7 +55,6 @@ export interface IATableConfig {
 
 export interface ITableParams<T> {
   data: T[];
-  setData: React.Dispatch<React.SetStateAction<T[]>>;
   col: ColumnDef<T>[];
   pageIndex: number;
   pageSize: number;

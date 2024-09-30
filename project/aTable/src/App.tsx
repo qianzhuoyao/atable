@@ -4141,7 +4141,6 @@ const [s,setS] = useState(["07485256009603607"])
         getRowCanExpand: () => true,
         renderSubComponent,
         data,
-        setData,
         collapse:true,
         //colVisibleColIdList:['age'],
         selectedRowKeyList:s,
