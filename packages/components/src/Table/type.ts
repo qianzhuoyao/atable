@@ -51,6 +51,7 @@ export interface IATableConfig {
   showSelectedInfo?: boolean;
   hideFooter?: boolean;
   footer?: (typeof FOOTER)[number][];
+  autoPagination?: boolean;
 }
 
 export interface ITableParams<T> {

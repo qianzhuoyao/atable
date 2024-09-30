@@ -66,6 +66,45 @@ import {
 } from "@tanstack/react-table";
 import { Loading } from "./loading.tsx";
 
+function deepEqual(obj1: any, obj2: any): boolean {
+  // 如果是基本类型，用 === 比较
+  if (obj1 === obj2) return true;
+
+  // 如果其中一个是 null 或者它们的类型不同，返回 false
+  if (obj1 == null || obj2 == null || typeof obj1 !== typeof obj2) return false;
+
+  // 如果是数组，长度不同直接返回 false
+  if (Array.isArray(obj1) && Array.isArray(obj2)) {
+    if (obj1.length !== obj2.length) return false;
+
+    // 递归比较数组的每个元素
+    for (let i = 0; i < obj1.length; i++) {
+      if (!deepEqual(obj1[i], obj2[i])) return false;
+    }
+
+    return true;
+  }
+
+  // 如果是对象，比较对象的键和值
+  if (typeof obj1 === "object" && typeof obj2 === "object") {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    // 如果对象的键数量不同，返回 false
+    if (keys1.length !== keys2.length) return false;
+
+    // 递归比较每个键对应的值
+    for (const key of keys1) {
+      if (!deepEqual(obj1[key], obj2[key])) return false;
+    }
+
+    return true;
+  }
+
+  // 否则，返回 false（意味着它们不相等）
+  return false;
+}
+
 const DEFAULT_SELECT_WIDTH = 40;
 
 const IndeterminateCheckbox = memo(
@@ -622,7 +661,15 @@ export const TableSlot = <T,>({
     useState<RowSelectionState>(setSelectionAct);
 
   useEffect(() => {
-    setRowSelection(setSelectionAct);
+    console.log("edddd");
+    setRowSelection((curSelect) => {
+      const res = setSelectionAct();
+      if (!deepEqual(curSelect, res)) {
+        return res;
+      } else {
+        return curSelect;
+      }
+    });
   }, [setSelectionAct]);
   const [permissions, setPermissions] = useState(DRAGGABLE | RESIZABLE);
 
@@ -778,13 +825,17 @@ export const TableSlot = <T,>({
   }, [columnVisibility, onColVisibleChange, table]);
 
   useEffect(() => {
-    onPageChange({ ...pagination, pageIndex: pagination.pageIndex + 1 });
-  }, [onPageChange, pagination]);
+    if (ctxState.config.autoPagination) {
+      onPageChange({ ...pagination, pageIndex: pagination.pageIndex + 1 });
+    }
+  }, [ctxState.config.autoPagination, onPageChange, pagination]);
 
   useEffect(() => {
-    table.setPageIndex(pageIndex - 1 <= 0 ? 0 : pageIndex - 1);
-    table.setPageSize(pageSize);
-  }, [pageIndex, pageSize, table]);
+    if (ctxState.config.autoPagination) {
+      table.setPageIndex(pageIndex - 1 <= 0 ? 0 : pageIndex - 1);
+      table.setPageSize(pageSize);
+    }
+  }, [ctxState.config.autoPagination, pageIndex, pageSize, table]);
 
   console.log(
     checkData,
@@ -1311,11 +1362,23 @@ export const TableSlot = <T,>({
                   ctxState.config.footer?.includes("jump") ||
                   !ctxState.config.footer
                 }
-                current={table.getState().pagination.pageIndex + 1}
-                pageSize={table.getState().pagination.pageSize}
+                current={
+                  ctxState.config.autoPagination
+                    ? table.getState().pagination.pageIndex + 1
+                    : pageIndex
+                }
+                pageSize={
+                  ctxState.config.autoPagination
+                    ? table.getState().pagination.pageSize
+                    : pageSize
+                }
                 onChange={(pageIndex, pageSize) => {
-                  table.setPageIndex(pageIndex - 1);
-                  table.setPageSize(pageSize);
+                  if (ctxState.config.autoPagination) {
+                    table.setPageIndex(pageIndex - 1);
+                    table.setPageSize(pageSize);
+                  } else {
+                    onPageChange({ pageIndex, pageSize });
+                  }
                 }}
               />
             </div>

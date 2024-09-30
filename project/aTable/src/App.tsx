@@ -4094,7 +4094,17 @@ function App() {
   onRefreshCallback(() => {
     console.log("reweeeeee");
   });
-
+  onPageChange(({pageIndex,pageSize})=>{
+    console.log(pageIndex,'cascacacsac')
+    setPageIndex(pageIndex)
+    setPageSize(pageSize)
+    if(pageIndex===1){
+      setData(dataList.slice(0,4))
+    }else{
+      setData(dataList.slice(4,8))
+    }
+    
+  })
   onAscSort(() => {
     console.log("asdasdasdasd");
   });
@@ -4121,6 +4131,7 @@ function App() {
   const table = slotBuilder({
     showTools: true,
     selectModel: true,
+    autoPagination:false,
     subRowsKey: "children",
     expand: true,
     showSelectedInfo: true,
@@ -4161,6 +4172,7 @@ function App() {
         col: columns,
         pageSize,
         pageIndex,
+        total:50,
       })}
     </>
   );
