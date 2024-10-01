@@ -4075,6 +4075,7 @@ function App() {
     []
   );
   const [z, setZ] = useState([]);
+  const [c, setC] = useState(false);
   const [s, setS] = useState([]);
   const [data, setData] = useState(() => dataList);
   const [pageIndex, setPageIndex] = useState(1);
@@ -4094,7 +4095,7 @@ function App() {
   onRefreshCallback(() => {
     console.log("reweeeeee");
   });
-  onPageChange(({pageIndex,pageSize})=>{
+  onPageChange?.(({pageIndex,pageSize})=>{
     console.log(pageIndex,'cascacacsac')
     setPageIndex(pageIndex)
     setPageSize(pageSize)
@@ -4146,6 +4147,7 @@ function App() {
   useEffect(() => {
     setTimeout(() => {
       setS(["07485256009603607"]);
+      setC(true)
     }, 2000);
   }, []);
   console.log(data, "csacascasa");
@@ -4159,7 +4161,7 @@ function App() {
         getRowCanExpand: () => true,
         renderSubComponent,
         data,
-        collapse: true,
+        collapse: c,
         //colVisibleColIdList:['age'],
         selectedRowKeyList: s,
         colSortable: () => true,

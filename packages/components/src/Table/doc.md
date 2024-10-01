@@ -80,28 +80,70 @@ slotBuilder 允许构建一个涵盖配置的函数，其可以返回一个表�
     });
 mwTable是一个表格的状态构建，其接受一个对象
 export interface ITableParams<T> {
+  //数据
   data: T[];
-  setData: React.Dispatch<React.SetStateAction<T[]>>;
+  //表头
   col: ColumnDef<T>[];
+  //分页下标
   pageIndex: number;
+  //当前页数量
   pageSize: number;
+  //加载状态
   loading?: boolean;
-  total: number;
-  clickedRowKeyList?: (() => unknown[]) | unknown[];
-  selectedRowKeyList?: (() => unknown[]) | unknown[];
+  //总数,如果不写就是data的length属性
+  total?: number;
+  //col显示隐藏
+  colVisibleColIdList?: (() => (string | undefined)[]) | (string | undefined)[];
+  //静态点击选中项
+  clickedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
+  //静态点击选中项，如果当前页面额外选中，则继续增加，如果当前项数据变了则以当前项数据为准
+  selectedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];
+  //单元格样式
   cellStyle?: <F>(prop: string, row: F) => CSSProperties;
+  //表头样式
   headerStyle?: (prop: string) => CSSProperties;
+  //全部展开状态
+  collapse?: boolean;
+  //行点击背景效果
+  rowClickedBackground?: string;
+  //行选择背景效果
+  rowSelectedBackground?: string;
+  //行样式
+  rowStyle?: (row: T, index: number) => CSSProperties;
+  //行样式类
+  rowClassName?: string;
+  //是否允许排序
+  colSortable?: (prop: string) => boolean;
+  //自定义列显隐配置项
+  popupColHidden?: (prop: string) => boolean;
+  //行选中不可选中
+  rowSelectDisable?: (row: T) => boolean;
+  //是否允许展开子节点
+  getRowCanExpand?: (row: Row<T>) => boolean;
+  //单元行子节点
+  renderSubComponent: (props: { row: Row<T> }) => React.ReactElement;
+  //自定义展开组件
+  customExpand?: (params: {
+    type: "isHead" | "isLeaf";
+    collapsed: boolean;
+  }) => ReactNode;
   style?: CSSProperties;
 }
+
 
 col
 //参照useTable col，
 const col=[
    {
+    //字段
         accessorKey: "age",
+        //标识
         id: "age",
+        //长度
         size:200,
+        //单元格组件
         cell: (info) => info.getValue(),
+        //列头组件
         header: () => "Age",
       },
       xxx
@@ -115,7 +157,6 @@ return <>{mwTable({
           width: "1000px",
         },
         data,
-        setData,
         col: columns,
         pageSize,
         pageIndex,

@@ -1,74 +1,19 @@
-import { ReactNode, useCallback, useMemo, useReducer, useRef } from "react";
-import {
-  IATableConfig,
-  IColInfo,
-  IEffect,
-  IHandleSelect,
-  ITableParams,
-} from "./type.ts";
+import { ReactNode, useCallback, useReducer, useRef } from "react";
+import { IATableConfig, ITableParams } from "./type.ts";
 import { initialTableState, TableContext, TableReducer } from "./reducer.ts";
 import { TableSlot } from "./TableSlot.tsx";
-import { UniqueIdentifier } from "@dnd-kit/core";
+import { useTableCallback } from "./useTableCallback.tsx";
 
 export const useATable = <T,>(tag?: string) => {
   const effectRef = useRef<{
-    m: Partial<IEffect<T>>;
     p: () => ReactNode | null;
   }>({
-    m: {},
     p: () => null,
   });
   const [state, dispatch] = useReducer(TableReducer, initialTableState);
 
-  const onRowSelectionChange = useCallback((rows: T[]) => {
-    effectRef.current.m.onSelectChange?.(rows);
-  }, []);
+  const { callbackRef, callback_unstable } = useTableCallback<T>();
 
-  const onColHeaderResizeStart = useCallback((prop: string) => {
-    effectRef.current.m.onHeaderResizeStart?.(prop);
-  }, []);
-
-  const onTableRefreshCallback = useCallback(() => {
-    effectRef.current.m.onRefreshCallback?.();
-  }, []);
-
-  const onColHeaderResizeEnd = useCallback((prop: string) => {
-    effectRef.current.m.onHeaderResizeEnd?.(prop);
-  }, []);
-  const onTableRowClick = useCallback((row: T) => {
-    effectRef.current.m.onRowClick?.(row);
-  }, []);
-  const onTableColInfoChange = useCallback((info: IColInfo[]) => {
-    effectRef.current.m.onTableSync?.(info);
-  }, []);
-  const onTableAscSort = useCallback((prop: string) => {
-    console.log("cweccewcecec");
-    effectRef.current.m.onAscSort?.(prop);
-  }, []);
-
-  const onTableColVisibleChange = useCallback((colIdList: string[]) => {
-    effectRef.current.m.onColVisibleChange?.(colIdList);
-  }, []);
-  const onTableDescSort = useCallback((prop: string) => {
-    effectRef.current.m.onDescSort?.(prop);
-  }, []);
-  const onHandleTableSelect = useCallback((params: IHandleSelect<T>) => {
-    effectRef.current.m.onHandleSelect?.(params);
-  }, []);
-  const onTablePageChange = useCallback(
-    (pageInfo: { pageSize: number; pageIndex: number }) => {
-      effectRef.current.m.onPageChange?.(pageInfo);
-    },
-    []
-  );
-
-  const onColHeaderMoveStart = useCallback((prop: UniqueIdentifier) => {
-    effectRef.current.m.onHeaderMoveStart?.(prop);
-  }, []);
-
-  const onColHeaderMoveEnd = useCallback((prop: UniqueIdentifier) => {
-    effectRef.current.m.onHeaderMoveEnd?.(prop);
-  }, []);
   const TableCreator = useCallback(
     (tableState: ITableParams<T>, config: IATableConfig) => {
       return (
@@ -78,20 +23,8 @@ export const useATable = <T,>(tag?: string) => {
           {tableState ? (
             <TableSlot<T>
               tableState={tableState}
-              onSelectChange={onRowSelectionChange}
-              onHeaderResizeStart={onColHeaderResizeStart}
-              onHeaderResizeEnd={onColHeaderResizeEnd}
-              onHeaderMoveEnd={onColHeaderMoveEnd}
-              onHeaderMoveStart={onColHeaderMoveStart}
-              onRefreshCallback={onTableRefreshCallback}
-              onRowClick={onTableRowClick}
-              onPageChange={onTablePageChange}
-              onHandleSelect={onHandleTableSelect}
-              onTableSync={onTableColInfoChange}
-              onAscSort={onTableAscSort}
-              onDescSort={onTableDescSort}
-              onColVisibleChange={onTableColVisibleChange}
               customPagination={effectRef.current.p()}
+              {...callbackRef.current.m}
             />
           ) : (
             <></>
@@ -99,23 +32,7 @@ export const useATable = <T,>(tag?: string) => {
         </TableContext.Provider>
       );
     },
-    [
-      onColHeaderMoveEnd,
-      onColHeaderMoveStart,
-      onColHeaderResizeEnd,
-      onColHeaderResizeStart,
-      onHandleTableSelect,
-      onRowSelectionChange,
-      onTableAscSort,
-      onTableColInfoChange,
-      onTableColVisibleChange,
-      onTableDescSort,
-      onTablePageChange,
-      onTableRefreshCallback,
-      onTableRowClick,
-      state,
-      tag,
-    ]
+    [callbackRef, state, tag]
   );
 
   const slotBuilder = useCallback(
@@ -125,68 +42,6 @@ export const useATable = <T,>(tag?: string) => {
     [TableCreator]
   );
 
-  const onRefreshCallback = useCallback(
-    (cb: IEffect<T>["onRefreshCallback"]) => {
-      effectRef.current.m.onRefreshCallback = cb;
-    },
-    []
-  );
-
-  const onHeaderResizeStart = useCallback(
-    (cb: IEffect<T>["onHeaderResizeStart"]) => {
-      effectRef.current.m.onHeaderResizeStart = cb;
-    },
-    []
-  );
-
-  const onHeaderResizeEnd = useCallback(
-    (cb: IEffect<T>["onHeaderResizeEnd"]) => {
-      effectRef.current.m.onHeaderResizeEnd = cb;
-    },
-    []
-  );
-
-  const onHeaderMoveStart = useCallback(
-    (cb: IEffect<T>["onHeaderMoveStart"]) => {
-      effectRef.current.m.onHeaderMoveStart = cb;
-    },
-    []
-  );
-
-  const onHeaderMoveEnd = useCallback((cb: IEffect<T>["onHeaderMoveEnd"]) => {
-    effectRef.current.m.onHeaderMoveEnd = cb;
-  }, []);
-
-  const onSelectChange = useCallback((cb: IEffect<T>["onSelectChange"]) => {
-    effectRef.current.m.onSelectChange = cb;
-  }, []);
-  const onRowClick = useCallback((cb: IEffect<T>["onRowClick"]) => {
-    effectRef.current.m.onRowClick = cb;
-  }, []);
-  const setUpdate = useCallback((cb: IEffect<T>["setUpdate"]) => {
-    effectRef.current.m.setUpdate = cb;
-  }, []);
-  const onPageChange = useCallback((cb: IEffect<T>["onPageChange"]) => {
-    effectRef.current.m.onPageChange = cb;
-  }, []);
-  const onTableSync = useCallback((cb: IEffect<T>["onTableSync"]) => {
-    effectRef.current.m.onTableSync = cb;
-  }, []);
-  const onDescSort = useCallback((cb: IEffect<T>["onDescSort"]) => {
-    effectRef.current.m.onDescSort = cb;
-  }, []);
-  const onHandleSelect = useCallback((cb: IEffect<T>["onHandleSelect"]) => {
-    effectRef.current.m.onHandleSelect = cb;
-  }, []);
-  const onAscSort = useCallback((cb: IEffect<T>["onAscSort"]) => {
-    effectRef.current.m.onAscSort = cb;
-  }, []);
-  const onColVisibleChange = useCallback(
-    (cb: IEffect<T>["onColVisibleChange"]) => {
-      effectRef.current.m.onColVisibleChange = cb;
-    },
-    []
-  );
   const scrollTo = (rowKey: string) => {
     document.getElementById(rowKey)?.scrollIntoView({ behavior: "smooth" });
   };
@@ -194,43 +49,10 @@ export const useATable = <T,>(tag?: string) => {
     effectRef.current.p = () => customPagination;
   }, []);
 
-  return useMemo(
-    () => ({
-      slotBuilder,
-      setUpdate,
-      setPagination,
-      scrollTo,
-      onHeaderResizeStart,
-      onRefreshCallback,
-      onHeaderMoveStart,
-      onRowClick,
-      onDescSort,
-      onColVisibleChange,
-      onAscSort,
-      onHeaderResizeEnd,
-      onHeaderMoveEnd,
-      onSelectChange,
-      onHandleSelect,
-      onPageChange,
-      onTableSync,
-    }),
-    [
-      onAscSort,
-      onColVisibleChange,
-      onDescSort,
-      onHeaderMoveEnd,
-      onHeaderMoveStart,
-      onHeaderResizeEnd,
-      onHeaderResizeStart,
-      onPageChange,
-      onRefreshCallback,
-      onHandleSelect,
-      onRowClick,
-      onSelectChange,
-      onTableSync,
-      setPagination,
-      setUpdate,
-      slotBuilder,
-    ]
-  );
+  return {
+    slotBuilder,
+    setPagination,
+    scrollTo,
+    ...callback_unstable,
+  };
 };

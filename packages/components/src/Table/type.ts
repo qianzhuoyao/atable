@@ -28,6 +28,10 @@ export interface IHandleSelect<T> {
   current?: T;
 }
 
+export type ICallbackName<T> = readonly (keyof Partial<IEffect<T>>)[];
+
+export type IKeyOfEffect<T> = keyof IEffect<T>;
+
 export interface IEffect<T> {
   onRefreshCallback: () => void;
   onSelectChange: (targetRows: T[]) => void;
@@ -66,7 +70,7 @@ export interface ITableParams<T> {
   pageIndex: number;
   pageSize: number;
   loading?: boolean;
-  total: number;
+  total?: number;
   //col显示隐藏
   colVisibleColIdList?: (() => (string | undefined)[]) | (string | undefined)[];
   clickedRowKeyList?: (() => (string | undefined)[]) | (string | undefined)[];

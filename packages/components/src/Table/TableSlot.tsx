@@ -65,45 +65,7 @@ import {
   PaginationState,
 } from "@tanstack/react-table";
 import { Loading } from "./loading.tsx";
-
-function deepEqual(obj1: any, obj2: any): boolean {
-  // 如果是基本类型，用 === 比较
-  if (obj1 === obj2) return true;
-
-  // 如果其中一个是 null 或者它们的类型不同，返回 false
-  if (obj1 == null || obj2 == null || typeof obj1 !== typeof obj2) return false;
-
-  // 如果是数组，长度不同直接返回 false
-  if (Array.isArray(obj1) && Array.isArray(obj2)) {
-    if (obj1.length !== obj2.length) return false;
-
-    // 递归比较数组的每个元素
-    for (let i = 0; i < obj1.length; i++) {
-      if (!deepEqual(obj1[i], obj2[i])) return false;
-    }
-
-    return true;
-  }
-
-  // 如果是对象，比较对象的键和值
-  if (typeof obj1 === "object" && typeof obj2 === "object") {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    // 如果对象的键数量不同，返回 false
-    if (keys1.length !== keys2.length) return false;
-
-    // 递归比较每个键对应的值
-    for (const key of keys1) {
-      if (!deepEqual(obj1[key], obj2[key])) return false;
-    }
-
-    return true;
-  }
-
-  // 否则，返回 false（意味着它们不相等）
-  return false;
-}
+import { deepEqual } from "./utils.ts";
 
 const DEFAULT_SELECT_WIDTH = 40;
 
@@ -144,7 +106,7 @@ const HeaderCheckBox = <T,>({
   table: Table<T>;
   selectModel: boolean;
   expand?: boolean;
-  onHandleSelect: IEffect<T>["onHandleSelect"];
+  onHandleSelect?: IEffect<T>["onHandleSelect"];
   customExpand: ITableParams<T>["customExpand"];
 }) => {
   console.log("table.getIsAllRowsSelected()");
@@ -195,7 +157,7 @@ const ColVisibleContent = <T,>({
   popupColHidden,
 }: {
   tag?: string;
-  onTableSync: IEffect<T>["onTableSync"];
+  onTableSync?: IEffect<T>["onTableSync"];
   table: Table<T>;
   popupColHidden?: (prop: string) => boolean;
 }) => {
@@ -279,13 +241,15 @@ const DraggableTableHeader = <T,>({
   expand?: boolean;
   headerStyle?: (prop: string) => CSSProperties;
   columnResizeMode: ColumnResizeMode;
-} & Pick<
-  IEffect<T>,
-  | "onHeaderResizeStart"
-  | "onHeaderResizeEnd"
-  | "onTableSync"
-  | "onAscSort"
-  | "onDescSort"
+} & Partial<
+  Pick<
+    IEffect<T>,
+    | "onHeaderResizeStart"
+    | "onHeaderResizeEnd"
+    | "onTableSync"
+    | "onAscSort"
+    | "onDescSort"
+  >
 >) => {
   const { state } = useTableContext();
   const { attributes, isDragging, listeners, setNodeRef, transform } =
@@ -472,7 +436,7 @@ export const TableSlot = <T,>({
 }: {
   customPagination?: ReactNode | null;
   tableState: ITableParams<T>;
-} & Omit<IEffect<T>, "setUpdate">) => {
+} & Partial<IEffect<T>>) => {
   const {
     col,
     data,
@@ -617,6 +581,7 @@ export const TableSlot = <T,>({
     ctxState.config.expand,
     ctxState.config.selectModel,
     customExpand,
+    onHandleSelect,
     rowSelectDisable,
   ]);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -818,19 +783,19 @@ export const TableSlot = <T,>({
     debugColumns: false,
   });
   useEffect(() => {
-    onSelectChange(table.getSelectedRowModel().rows.map((r) => r.original));
+    onSelectChange?.(table.getSelectedRowModel().rows.map((r) => r.original));
   }, [onSelectChange, rowSelection, table]);
   useEffect(() => {
     console.log(columnVisibility, "columnVisibility");
     const showColList = table.getVisibleFlatColumns();
-    onColVisibleChange(
+    onColVisibleChange?.(
       showColList.map((c) => c.id).filter((z) => ![SELECT_KEY].includes(z))
     );
   }, [columnVisibility, onColVisibleChange, table]);
 
   useEffect(() => {
     if (ctxState.config.autoPagination) {
-      onPageChange({ ...pagination, pageIndex: pagination.pageIndex + 1 });
+      onPageChange?.({ ...pagination, pageIndex: pagination.pageIndex + 1 });
     }
   }, [ctxState.config.autoPagination, onPageChange, pagination]);
 
@@ -1381,7 +1346,7 @@ export const TableSlot = <T,>({
                     table.setPageIndex(pageIndex - 1);
                     table.setPageSize(pageSize);
                   } else {
-                    onPageChange({ pageIndex, pageSize });
+                    onPageChange?.({ pageIndex, pageSize });
                   }
                 }}
               />
