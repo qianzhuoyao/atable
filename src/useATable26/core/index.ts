@@ -1,1 +1,1 @@
-export { useATable } from "./useATable";
+export { useCreateATable } from "./useATable";

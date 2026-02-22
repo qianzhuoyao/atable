@@ -1,69 +1,72 @@
-import type { RowSelectionState } from "@tanstack/react-table";
 import type { State } from "../core/type";
 import { useTableStore } from "../core/useTableStore";
 import { useTableActions } from "../core/useTableAction";
 
-const useSetTableSelection = (initSelection: RowSelectionState) => {
+const useSetTableSelection = (initSelection: State["selected"]) => {
   const selected = useTableStore<State["selected"]>(() => initSelection);
   const { setSelected } = useTableActions();
   return [selected, setSelected] as const;
 };
 
-const useSetTableColumnFilters = () => {
-  const columnFilters = useTableStore<State["columnFilters"]>(
-    (s) => s.columnFilters,
-  );
+const useSetTableColumnFilters = (initFilter: State["columnFilters"]) => {
+  const columnFilters = useTableStore<State["columnFilters"]>(() => initFilter);
   const { setColumnFilters } = useTableActions();
   return [columnFilters, setColumnFilters] as const;
 };
 
-const useSetTableColumnOrder = () => {
-  const columnOrder = useTableStore<State["columnOrder"]>((s) => s.columnOrder);
+const useSetTableColumnOrder = (initColumnOrder: State["columnOrder"]) => {
+  const columnOrder = useTableStore<State["columnOrder"]>(
+    () => initColumnOrder,
+  );
   const { setColumnOrder } = useTableActions();
   return [columnOrder, setColumnOrder] as const;
 };
 
-const useSetTableColumnPinning = () => {
+const useSetTableColumnPinning = (
+  initColumnPinning: State["columnPinning"],
+) => {
   const columnPinning = useTableStore<State["columnPinning"]>(
-    (s) => s.columnPinning,
+    () => initColumnPinning,
   );
   const { setColumnPinning } = useTableActions();
   return [columnPinning, setColumnPinning] as const;
 };
 
-const useSetTableColumnVisibility = () => {
+const useSetTableColumnVisibility = (
+  initColumnVisibility: State["columnVisibility"],
+) => {
   const columnVisibility = useTableStore<State["columnVisibility"]>(
-    (s) => s.columnVisibility,
+    () => initColumnVisibility,
   );
   const { setColumnVisibility } = useTableActions();
   return [columnVisibility, setColumnVisibility] as const;
 };
-const useSetTableRowPinning = () => {
-  const rowPinning = useTableStore<State["rowPinning"]>((s) => s.rowPinning);
+const useSetTableRowPinning = (initRowPinning: State["rowPinning"]) => {
+  const rowPinning = useTableStore<State["rowPinning"]>(() => initRowPinning);
   const { setRowPinning } = useTableActions();
   return [rowPinning, setRowPinning] as const;
 };
 
-const useSetTableExpanded = () => {
-  const expanded = useTableStore<State["expanded"]>((s) => s.expanded);
+const useSetTableExpanded = (initExpanded: State["expanded"]) => {
+  const expanded = useTableStore<State["expanded"]>(() => initExpanded);
   const { setExpanded } = useTableActions();
   return [expanded, setExpanded] as const;
 };
 
-const useSetTablePagination = () => {
-  const pagination = useTableStore<State["pagination"]>((s) => s.pagination);
+const useSetTablePagination = (initPagination: State["pagination"]) => {
+  const pagination = useTableStore<State["pagination"]>(() => initPagination);
   const { setPagination } = useTableActions();
   return [pagination, setPagination] as const;
 };
 
-const useSetTableSorting = () => {
-  const sorting = useTableStore<State["sorting"]>((s) => s.sorting);
+const useSetTableSorting = (initSorting: State["sorting"]) => {
+  const sorting = useTableStore<State["sorting"]>(() => initSorting);
   const { setSorting } = useTableActions();
   return [sorting, setSorting] as const;
 };
 
-const useSetTableGrouping = () => {
-  const grouping = useTableStore<State["grouping"]>((s) => s.grouping);
+const useSetTableGrouping = (initGrouping: State["grouping"]) => {
+  const grouping = useTableStore<State["grouping"]>(() => initGrouping);
   const { setGrouping } = useTableActions();
   return [grouping, setGrouping] as const;
 };

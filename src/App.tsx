@@ -1,25 +1,30 @@
-import { useATable } from "./useATable26/core";
+import { useCreateATable } from "./useATable26/core";
 import { TableProvider } from "./useATable26/core/context";
+import { Pagination } from "./useATable26/core/pagination";
 import {
   IndeterminateCheckbox,
   TableTemplate,
 } from "./useATable26/core/template";
-import { useSetTableSelection } from "./useATable26/hooks";
+import { ToolBar } from "./useATable26/core/toolbar";
+import {
+  useSetTablePagination,
+  useSetTableSelection,
+} from "./useATable26/hooks";
 
 const Content = () => {
   const [rowSelected, setRowSelected] = useSetTableSelection({});
-  const table = useATable({
+  const [pagination, setPagination] = useSetTablePagination({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const table = useCreateATable({
     data: [{ name: "111" }],
-    onSelectionChange: (selected) => {
-      setRowSelected(selected);
-      console.log("selected", selected);
-    },
     state: {
       selected: rowSelected,
+      pagination,
     },
     selection: {
       mode: "multiple",
-      enabled: true,
     },
     columns: [
       {
@@ -54,9 +59,12 @@ const Content = () => {
       },
     ],
   });
+
   return (
     <div className="App" style={{ width: "100vw", height: "100vh" }}>
+      <ToolBar></ToolBar>
       <TableTemplate table={table}></TableTemplate>
+      <Pagination pagination={pagination}></Pagination>
     </div>
   );
 };

@@ -67,7 +67,7 @@ export function IndeterminateCheckbox({
   )
 }
 
-export const TableTemplate = <T,>({ table }: { table: Table<T> }) => {
+export const TableTemplate = <T,>({ table, }: { table: Table<T>, }) => {
   return (
     <div className="p-2">
       <div>
