@@ -1,16 +1,4 @@
-import type {
-  ColumnDef,
-  ColumnFiltersState,
-  ColumnOrderState,
-  ColumnVisibilityState,
-  ExpandedState,
-  GroupingState,
-  PaginationState,
-  RowPinningState,
-  RowSelectionState,
-  ColumnPinningState,
-  SortingState,
-} from "@tanstack/react-table";
+import type { ColumnDef, ColumnOrderState } from "@tanstack/react-table";
 
 export interface IUseATableProps<T> {
   data: T[];
@@ -30,33 +18,13 @@ export interface IUseATableProps<T> {
   // onSortingChange?: (sorting: SortingState) => void;
 }
 export type State = {
-  globalFilter: GroupingState;
   columnOrder: ColumnOrderState;
-  columnVisibility: ColumnVisibilityState;
-  selected: RowSelectionState;
-  expanded: ExpandedState;
-  pagination: PaginationState;
-  rowPinning: RowPinningState;
-  sorting: SortingState;
-  grouping: GroupingState;
-  columnFilters: ColumnFiltersState;
-  columnPinning: ColumnPinningState;
 };
 
 export type StoreBundle = {
   api: ReturnType<typeof createStore<State>>;
   useStore: <T>(sel: (s: State) => T, eq?: (a: T, b: T) => boolean) => T;
   actions: {
-    patch: (p: State) => void;
-    setSelected: (selected: State["selected"]) => void;
-    setColumnFilters: (columnFilters: State["columnFilters"]) => void;
-    setGrouping: (grouping: State["grouping"]) => void;
-    setSorting: (sorting: State["sorting"]) => void;
-    setColumnPinning: (columnPinning: State["columnPinning"]) => void;
-    setRowPinning: (rowPinning: State["rowPinning"]) => void;
-    setPagination: (pagination: State["pagination"]) => void;
-    setExpanded: (expanded: State["expanded"]) => void;
-    setColumnVisibility: (columnVisibility: State["columnVisibility"]) => void;
     setColumnOrder: (columnOrder: State["columnOrder"]) => void;
   };
 };
